@@ -1,0 +1,11 @@
+{
+  "name": "zoov-mono-repo",
+  "private": true,
+  "workspaces": [
+    "zoov",
+    "example"
+  ],
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}
