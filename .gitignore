@@ -4,3 +4,6 @@ node_modules
 .idea
 
 .DS_Store
+
+# will automatically be copied from home dir before publish
+zoov/README.md

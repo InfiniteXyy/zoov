@@ -8,8 +8,9 @@
     "immer": "^8.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "zustand": "^3.2.0",
-    "zoov": "0.0.1"
+    "rxjs": "^6.6.3",
+    "zoov": "0.0.1",
+    "zustand": "^3.2.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",

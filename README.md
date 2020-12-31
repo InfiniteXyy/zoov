@@ -18,8 +18,9 @@ see example/app.tsx
 ### TodoList
 
 - [ ] better Readme
-- [ ] 支持异步 Effect
+- [x] 支持异步 Effect
 - [ ] unit test
 - [ ] useState 支持选择器
-- [ ] 支持 模块之间组合（通过在 defineModule 中 inject）
+- [ ] 支持 模块之间组合（例如通过在 defineModule 中 inject）
+- [ ] 支持 redux dev tools
 - [ ] views 计算属性在多个组件内能够只用计算一次

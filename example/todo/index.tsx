@@ -1,33 +1,31 @@
-import React, { useState } from 'react'
-import { todoModule } from './module'
+import React, { useEffect } from 'react';
+import { todoModule } from './module';
 
 export const TodoList = () => {
-  const [showUnchecked, setShowUnchecked] = useState(false)
+  const { list, isLoading, params } = todoModule.useState();
+  const { toggleChecked, fetchList, updateType } = todoModule.useActions();
+  const finishCount = todoModule.useFinishedCount();
 
-  const list = todoModule.useList()
-  const uncheckedList = todoModule.useUnchecked()
-
-  const computedList = showUnchecked ? uncheckedList : list
-
-  const { toggleCheck, deleteTodo } = todoModule.useActions()
-  const finishCount = todoModule.useFinishedCount()
+  useEffect(() => {
+    fetchList({ type: 'Frontend' });
+  }, []);
 
   return (
     <div>
-      <div>finished: {finishCount}</div>
-      <label>
-        <input type="checkbox" checked={showUnchecked} onChange={() => setShowUnchecked(!showUnchecked)} />
-        show unchecked
-      </label>
+      <h3>{params.type} Todolist</h3>
+      <button onClick={() => updateType(params.type === 'Frontend' ? 'Backend' : 'Frontend')}>Toggle List</button>
+      <b>finished: {finishCount}</b>
+      {isLoading && <div>loading</div>}
       <ul>
-        {computedList.map((item) => (
+        {list.map((item) => (
           <li key={item.title}>
-            <button onClick={() => deleteTodo(item.title)}>x</button>
-            {item.title}
-            <input type="checkbox" checked={item.checked} onChange={() => toggleCheck(item.title)} />
+            <label>
+              {item.title}
+              <input type="checkbox" checked={item.checked} onChange={() => toggleChecked(item.title, !item.checked)} />
+            </label>
           </li>
         ))}
       </ul>
     </div>
-  )
-}
+  );
+};
