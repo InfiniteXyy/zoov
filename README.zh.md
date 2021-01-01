@@ -1,43 +1,41 @@
 ## ZOOV
 
-[中文](https://github.com/InfiniteXyy/zoov/blob/main/README.zh.md)
-
-A React modular state management, based on Zustand
+一个基于 Zustand 的 React 模块化状态管理库
 
 **ZOOV = Zustand + Module**
 
-### Features
+### 特点
 
-- 😌 Comfortable type inference
-- ✨ No tedious State-Selector, auto-generate state hooks
-- 🍳 Simple Wrapper on Zustand
-- 🧮 Modular state management
+- 😌 舒适的类型推断
+- ✨ 拒绝繁琐的 Selector，自动生成状态 hooks
+- 🍳 基于 Zustand 的简单的封装，没有魔法
+- 🧮 模块化状态管理
 
-### Quick Start
+### 快速启动
 
-You can try this [Example](https://codesandbox.io/s/zoov-example-vmv3p)
+试试这个 [Example](https://codesandbox.io/s/zoov-example-vmv3p)
 
-Or install locally
+或在本地项目中安装
 
 ```sh
 yarn add rxjs immer zustand # peer dependencies
 yarn add zoov
 ```
 
-### Examples
+### 示例
 
-#### Basic
+#### 基本功能
 
 ```tsx
-// 1. Defined a Module with a defaultState
+// 1. 需要先定义一个 Module，并给予 defaultState
 const Module = defineModule().model({ count: 0 });
 
-// 2. Call init function to get a module instance
+// 2. 调用 Module 的 init 方法可以得到 module 实例
 const module = Module.init();
-// 2.5. Different module instances won't affect each other
+// 2.5. 可以初始化多个实例，并给予不同的初始值，互相不会影响
 const module2 = Module.init({ count: 1 });
 
-// 3. Use auto-generated state hooks in your component
+// 3. 在任何 React 组件中使用 hooks
 const App = () => {
   // count: number
   const count = module.useCount();
@@ -45,18 +43,19 @@ const App = () => {
 };
 ```
 
-#### Extend Module
+#### 扩展 Module
 
 ```tsx
+// 在定义 Module 的时候可以带有事件函数，也可以创建视图
 const Module = defineModule()
   .model({ count: 0 })
-  // 1. Actions are pure functions to cause state update (based on immer)
+  // 1. Action 是无副作用的状态变化
   .actions({
-    increase: (draft, value) => draft.count += value,
+    increase: (draft, value) => draft.count += value, // 默认使用了 Immer
     decrease: (draft, value) => draft.count -= value,
     reset: (draft) => draft.count = 0,
   })
-  // 2. Methods are more powerful functions, like async function, and you can trigger actions or getState here
+  // 2. Method 是一些复杂事件，可以组合 Actions，或使用异步函数
   .methods((self) => {
     async increaseAfter1s() {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -64,13 +63,13 @@ const Module = defineModule()
       console.log(self.getState())
     }
   })
-  // 3. Views are computed properties based on state
+  // 3. View 是基于状态计算出的属性，当状态变更后，会自动触发更新
   .views({
     doubled: (state) => state.count * 2
   })
 ```
 
-#### Use RxJS
+#### 使用 RxJS
 
 ```tsx
 const Module = defineModule()
@@ -81,8 +80,8 @@ const Module = defineModule()
     reset: (draft) => (draft.count = 0),
   })
   .methods((self, effect) => ({
-    // Sometimes, we need RxJS to handle more complex event
-    // the second argument effect, is aimed to wrap RxJS flow
+    // 有时，只是 Async 函数可能无法满足需求
+    // methods 的第二个参数 effect，允许用 RxJS 封装一个流
     setTimer: effect<{ interval?: number }>((payload$) => {
       return payload$.pipe(
         switchMap(({ interval }) => {
@@ -102,11 +101,11 @@ const Module = defineModule()
 
 ### TodoList
 
-- [x] better Readme
-- [x] support Effect
+- [x] 优化 Readme
+- [x] 支持异步 Effect
 - [ ] Unit Test
-- [ ] refactor with TS
-- [ ] support selector in hooks
-- [ ] support di?
-- [ ] support redux dev tools
-- [ ] computed values should only be triggered once
+- [ ] 使用 TS 重构
+- [ ] 所有状态 hooks 支持选择器
+- [ ] 支持 模块之间组合（例如通过在 defineModule 中 inject）
+- [ ] 支持 redux dev tools
+- [ ] views 计算属性在多个组件内能够只用计算一次
