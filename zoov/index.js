@@ -5,6 +5,8 @@ import { Subject } from 'rxjs';
 
 const capitalize = (content) => content.charAt(0).toUpperCase() + content.slice(1);
 
+const devtoolsWrap = process && process.env && process.env.NODE_ENV === 'development' ? devtools : (fn) => fn;
+
 function validateNaming(object) {
   if (Object.keys(object).some((key) => key === 'actions' || key === 'store')) {
     throw new Error('key cannot be Store or Actions');
@@ -52,7 +54,7 @@ export function defineModule(moduleName) {
         },
         init: (currentState = {}) => {
           const scope = {
-            store: create(devtools(redux(reducer, { ...state, ...currentState }), moduleName)),
+            store: create(devtoolsWrap(redux(reducer, { ...state, ...currentState }), moduleName)),
             actions: {},
             stateHooks: {},
             viewHooks: {},
@@ -74,7 +76,8 @@ export function defineModule(moduleName) {
 
           // build state hooks
           for (const key in state) {
-            scope.stateHooks[`use${capitalize(key)}`] = () => scope.store((state) => state[key]);
+            const selector = (state) => state[key];
+            scope.stateHooks[`use${capitalize(key)}`] = () => scope.store(selector);
           }
           // build view hooks
           for (const key in views) {

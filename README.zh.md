@@ -1,17 +1,17 @@
-## ZOOV
+# ZOOV
 
 一个基于 Zustand 的 React 模块化状态管理库
 
 **ZOOV = Zustand + Module**
 
-### 特点
+## 特点
 
 - 😌 舒适的类型推断
 - ✨ 拒绝繁琐的 Selector，自动生成状态 hooks
 - 🍳 基于 Zustand 的简单的封装，没有魔法
 - 🧮 模块化状态管理
 
-### 快速启动
+## 快速启动
 
 试试这个 [Example](https://codesandbox.io/s/zoov-example-vmv3p)
 
@@ -22,7 +22,7 @@ yarn add rxjs immer zustand # peer dependencies
 yarn add zoov
 ```
 
-### 示例
+## 示例
 
 #### 基本功能
 
@@ -99,13 +99,3 @@ const Module = defineModule()
   }));
 ```
 
-### TodoList
-
-- [x] 优化 Readme
-- [x] 支持异步 Effect
-- [ ] Unit Test
-- [ ] 使用 TS 重构
-- [ ] 所有状态 hooks 支持选择器
-- [ ] 支持 模块之间组合（例如通过在 defineModule 中 inject）
-- [ ] 支持 redux dev tools
-- [ ] views 计算属性在多个组件内能够只用计算一次

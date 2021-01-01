@@ -1,4 +1,4 @@
-## ZOOV
+# ZOOV
 
 [中文](https://github.com/InfiniteXyy/zoov/blob/main/README.zh.md)
 
@@ -6,14 +6,14 @@ A React modular state management, based on Zustand
 
 **ZOOV = Zustand + Module**
 
-### Features
+## Features
 
 - 😌 Comfortable type inference
 - ✨ No tedious State-Selector, auto-generate state hooks
 - 🍳 Simple Wrapper on Zustand
 - 🧮 Modular state management
 
-### Quick Start
+## Quick Start
 
 You can try this [Example](https://codesandbox.io/s/zoov-example-vmv3p)
 
@@ -24,7 +24,7 @@ yarn add rxjs immer zustand # peer dependencies
 yarn add zoov
 ```
 
-### Examples
+## Examples
 
 #### Basic
 
@@ -104,9 +104,10 @@ const Module = defineModule()
 
 - [x] better Readme
 - [x] support Effect
+- [ ] Persist helper
 - [ ] Unit Test
 - [ ] refactor with TS
 - [ ] support selector in hooks
 - [ ] support di?
-- [ ] support redux dev tools
+- [x] support redux dev tools
 - [ ] computed values should only be triggered once
