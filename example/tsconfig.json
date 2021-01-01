@@ -3,9 +3,6 @@
     "strict": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "lib": [
-      "ESNext",
-      "DOM"
-    ]
+    "lib": ["ESNext", "DOM"]
   }
 }

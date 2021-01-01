@@ -7,3 +7,4 @@ node_modules
 
 # will automatically be copied from home dir before publish
 zoov/README.md
+zoov/dist

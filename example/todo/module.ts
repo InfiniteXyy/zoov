@@ -48,4 +48,4 @@ const TodoModule = defineModule()
     },
   }));
 
-export const todoModule = TodoModule.init();
+export const todoModule = TodoModule.init('todoModule');

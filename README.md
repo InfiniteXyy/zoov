@@ -1,16 +1,14 @@
 # ZOOV
 
-[中文](https://github.com/InfiniteXyy/zoov/blob/main/README.zh.md)
-
-A React modular state management, based on Zustand
+A React modular state-management solution, based on Zustand
 
 **ZOOV = Zustand + Module**
 
 ## Features
 
 - 😌 Comfortable type inference
-- ✨ No tedious State-Selector, auto-generate state hooks
-- 🍳 Simple Wrapper on Zustand
+- ✨ No selector, state hooks are automatically generated
+- 🍳 100 line, Simple Wrapper on Zustand
 - 🧮 Modular state management
 
 ## Quick Start
@@ -50,13 +48,13 @@ const App = () => {
 ```tsx
 const Module = defineModule()
   .model({ count: 0 })
-  // 1. Actions are pure functions to cause state update (based on immer)
+  // 1. Actions are pure immer reducers update state
   .actions({
     increase: (draft, value) => draft.count += value,
     decrease: (draft, value) => draft.count -= value,
     reset: (draft) => draft.count = 0,
   })
-  // 2. Methods are more powerful functions, like async function, and you can trigger actions or getState here
+  // 2. Methods are powerful functions, like async function, and you can trigger actions or getState here
   .methods((self) => {
     async increaseAfter1s() {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -80,9 +78,9 @@ const Module = defineModule()
     decrease: (draft, value) => (draft.count -= value),
     reset: (draft) => (draft.count = 0),
   })
+  // Sometimes, we need RxJS to help us handle complex event
+  // Here, the [effect] argument, is aimed to wrap an RxJS listener
   .methods((self, effect) => ({
-    // Sometimes, we need RxJS to handle more complex event
-    // the second argument effect, is aimed to wrap RxJS flow
     setTimer: effect<{ interval?: number }>((payload$) => {
       return payload$.pipe(
         switchMap(({ interval }) => {
@@ -104,10 +102,11 @@ const Module = defineModule()
 
 - [x] better Readme
 - [x] support Effect
-- [ ] Persist helper
-- [ ] Unit Test
-- [ ] refactor with TS
-- [ ] support selector in hooks
-- [ ] support di?
 - [x] support redux dev tools
+- [ ] refactor with TS
+- [ ] Unit Test
+- [ ] Persist helper
 - [ ] computed values should only be triggered once
+- [ ] support di?
+- [ ] support svelte?
+- [ ] selector in hooks?
