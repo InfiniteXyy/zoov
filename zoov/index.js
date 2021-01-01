@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { redux, devtools } from 'zustand/middleware';
+import { redux, devtools, persist } from 'zustand/middleware';
 import produce from 'immer';
 import { Subject } from 'rxjs';
 
@@ -21,7 +21,7 @@ function effect(builder) {
   };
 }
 
-export function defineModule(moduleName) {
+export function defineModule() {
   let actions = {};
   let state = {};
   let views = {};
@@ -52,9 +52,13 @@ export function defineModule(moduleName) {
           methodsBuilders.push(builder);
           return module;
         },
-        init: (currentState = {}) => {
+        init: (_options = {}) => {
+          const options = typeof _options === 'string' ? { name: _options } : _options;
+
+          const persistWrap = options.persist ? (fn) => persist(fn, { name: options.persist }) : (fn) => fn;
+
           const scope = {
-            store: create(devtoolsWrap(redux(reducer, { ...state, ...currentState }), moduleName)),
+            store: create(devtoolsWrap(persistWrap(redux(reducer, { ...state, ...(options.state || {}) })), options.name)),
             actions: {},
             stateHooks: {},
             viewHooks: {},

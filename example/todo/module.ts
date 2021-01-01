@@ -6,7 +6,7 @@ import { FetchType, mockFetchTodos, mockMutateChecked } from './utils';
 type Todo = { title: string; checked: boolean };
 type State = { list: Todo[]; isLoading: boolean; params: { type: FetchType } };
 
-const TodoModule = defineModule('todoModule')
+const TodoModule = defineModule()
   .model<State>({ list: [], isLoading: false, params: { type: 'Frontend' } })
   .views({
     finishedCount(state) {

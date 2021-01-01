@@ -3,7 +3,7 @@ import { EMPTY, timer } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 import { defineModule } from 'zoov';
 
-const CounterModule = defineModule('counterModule')
+const CounterModule = defineModule()
   .model({ count: 0 })
   .actions({
     increase: (draft, value) => (draft.count += value),
@@ -29,7 +29,7 @@ const CounterModule = defineModule('counterModule')
     }),
   }));
 
-const counterModule = CounterModule.init();
+const counterModule = CounterModule.init({ name: 'counterModule', persist: 'counter' });
 
 export const Counter = () => {
   const count = counterModule.useCount();
