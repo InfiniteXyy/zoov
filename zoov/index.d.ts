@@ -28,4 +28,4 @@ type Module<State extends StateRecord, Actions = {}, Methods = {}, Views = {}, E
 
 type Instance<State extends StateRecord, Actions, Methods, Views> = GenHooks<State> & GenHooks<Views> & { useActions: () => Actions & Methods; useState: UseStore<State> };
 
-export const defineModule: () => { model: <State extends StateRecord>(defaultState: State) => Module<State> };
+export const defineModule: (name?: string) => { model: <State extends StateRecord>(defaultState: State) => Module<State> };

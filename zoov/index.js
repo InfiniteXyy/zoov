@@ -1,4 +1,5 @@
 import create from 'zustand';
+import { redux, devtools } from 'zustand/middleware';
 import produce from 'immer';
 import { Subject } from 'rxjs';
 
@@ -18,11 +19,13 @@ function effect(builder) {
   };
 }
 
-export function defineModule() {
+export function defineModule(moduleName) {
   let actions = {};
   let state = {};
   let views = {};
   let methodsBuilders = [];
+
+  const reducer = (state, { type, payload }) => actions[type](...payload)(state);
 
   return {
     model(_state) {
@@ -30,7 +33,12 @@ export function defineModule() {
       state = _state;
       const module = {
         actions: (_actions) => {
-          actions = _actions;
+          Object.keys(_actions).forEach((key) => {
+            actions[key] = (...args) =>
+              produce((draft) => {
+                _actions[key](draft, ...args);
+              });
+          });
           return module;
         },
         views: (_views) => {
@@ -44,7 +52,7 @@ export function defineModule() {
         },
         init: (currentState = {}) => {
           const scope = {
-            store: create(() => ({ ...state, ...currentState })),
+            store: create(devtools(redux(reducer, { ...state, ...currentState }), moduleName)),
             actions: {},
             stateHooks: {},
             viewHooks: {},
@@ -55,25 +63,15 @@ export function defineModule() {
             getState: () => scope.store.getState(),
           };
 
-          // build methods and bind this
+          // build methods
+          const dispatch = scope.store.getState().dispatch;
+          for (const key in actions) {
+            scope.actions[key] = (...args) => dispatch({ type: key, payload: args });
+          }
           methodsBuilders.forEach((builder) => {
-            const methods = builder(self, effect);
-            for (const key in methods) {
-              methods[key] = methods[key].bind(methods);
-            }
-            scope.actions = { ...scope.actions, ...methods };
+            scope.actions = { ...scope.actions, ...builder(self, effect) };
           });
 
-          // build actions with immer
-          for (const key in actions) {
-            scope.actions[key] = (...args) => {
-              scope.store.setState(
-                produce((draft) => {
-                  actions[key](draft, ...args);
-                })
-              );
-            };
-          }
           // build state hooks
           for (const key in state) {
             scope.stateHooks[`use${capitalize(key)}`] = () => scope.store((state) => state[key]);
