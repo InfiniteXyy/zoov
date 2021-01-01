@@ -12,7 +12,7 @@ export const TodoList = () => {
 
   return (
     <div>
-      <h3>{params.type} Todolist</h3>
+      <h1>{params.type} Todolist</h1>
       <button onClick={() => updateType(params.type === 'Frontend' ? 'Backend' : 'Frontend')}>Toggle List</button>
       <b>finished: {finishCount}</b>
       {isLoading && <div>loading</div>}

@@ -6,7 +6,7 @@ import type { Observable } from 'rxjs';
 type StateRecord = Record<string | number | symbol, unknown>;
 
 // utils
-type EffectBuilder = <T>(builder: (arg: Observable<T>) => Observable<unknown>) => (arg: T) => void;
+type EffectBuilder = <T>(builder: (payload$: Observable<T>) => Observable<unknown>) => (payload: T) => void;
 type OmitDraftArg<F> = F extends (draft: Draft<any>, ...args: infer A) => void ? (...args: A) => void : never;
 
 // builders

@@ -1,9 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Counter } from './counter';
 import { TodoList } from './todo';
 
 const App = () => {
-  return <TodoList />;
+  return (
+    <div>
+      <TodoList />
+      <Counter />
+    </div>
+  );
 };
 
 ReactDOM.render(<App />, document.getElementById('root'));
