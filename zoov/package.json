@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.0.2-alpha.3",
+  "version": "0.0.2",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/zoov.js",
@@ -29,6 +29,7 @@
     "prebuild": "rimraf ./dist",
     "prepare": "npm run build",
     "build": "rollup -c",
+    "test": "jest --coverage",
     "dev": "rollup -c --watch"
   },
   "peerDependencies": {
@@ -38,9 +39,17 @@
     "zustand": ">=3.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.19",
     "@types/node": "^14.14.17",
+    "codecov": "^3.8.1",
+    "jest": "^26.6.3",
     "rimraf": "^3.0.2",
     "rollup": "^2.35.1",
-    "rollup-plugin-typescript2": "^0.29.0"
+    "rollup-plugin-typescript2": "^0.29.0",
+    "ts-jest": "^26.4.4"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   }
 }

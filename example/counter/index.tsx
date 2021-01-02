@@ -6,8 +6,8 @@ import { defineModule } from 'zoov';
 const CounterModule = defineModule()
   .model({ count: 0 })
   .actions({
-    increase: (draft, value) => (draft.count += value),
-    decrease: (draft, value) => (draft.count -= value),
+    increase: (draft, value: number) => (draft.count += value),
+    decrease: (draft, value: number) => (draft.count -= value),
     reset: (draft) => (draft.count = 0),
   })
   .methods((self, effect) => ({

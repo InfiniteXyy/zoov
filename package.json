@@ -8,5 +8,9 @@
   "devDependencies": {
     "typescript": "^4.1.3",
     "prettier": "^2.2.1"
+  },
+  "scripts": {
+    "build": "yarn workspace zoov build",
+    "test": "yarn workspace zoov test"
   }
 }
