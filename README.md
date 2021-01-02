@@ -1,8 +1,12 @@
-# ZOOV
-
-A React modular state-management solution, based on Zustand
-
-**ZOOV = Zustand + Module**
+<h1 align="center">ZOOV</h1>
+<p align="center">✨ ZOOV = Zustand + Module</p>
+<p align="center">
+<a href="https://github.com/infinitexyy/zoov/actions"><img src="https://img.shields.io/github/workflow/status/infinitexyy/zoov/main.svg" alt="Build Status"></a>
+<a href="https://codecov.io/gh/infinitexyy/zoov"><img src="https://img.shields.io/codecov/c/github/infinitexyy/zoov.svg" alt="Code Coverage"></a>
+<a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
+<a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
+<a href="https://bundlephobia.com/result?p=zoov"><img src="http://img.badgesize.io/https://unpkg.com/zoov/dist/zoov.js?compression=brotli&label=brotli" alt="brotli"></a>
+</p>
 
 ## Features
 
@@ -103,8 +107,8 @@ const Module = defineModule()
 - [x] better Readme
 - [x] support Effect
 - [x] support redux dev tools
-- [ ] refactor with TS
-- [ ] Unit Test
+- [x] refactor with TS
+- [x] Unit Test
 - [ ] Persist helper
 - [ ] computed values should only be triggered once
 - [ ] support di?

@@ -11,6 +11,6 @@ jobs:
       - name: test
         run: yarn && yarn test
       - name: report
-        uses: codecov/codecov-action@v1.0.6
+        uses: codecov/codecov-action@v1.1.1
         env:
           CI: true
