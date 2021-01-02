@@ -29,7 +29,7 @@ const CounterModule = defineModule()
     }),
   }));
 
-const counterModule = CounterModule.init({ name: 'counterModule', persist: 'counter' });
+const counterModule = CounterModule.init('counterModule');
 
 export const Counter = () => {
   const count = counterModule.useCount();

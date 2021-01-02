@@ -1,31 +1,46 @@
 {
   "name": "zoov",
-  "version": "0.0.1",
+  "version": "0.0.2-alpha.3",
   "author": "InfiniteXyy",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/zoov.js",
+  "unpkg": "dist/zoov.js",
+  "module": "dist/zoov.esm.js",
+  "types": "dist/types/index.d.ts",
   "homepage": "https://github.com/InfiniteXyy/zoov",
+  "description": "A React modular state-management solution, based on Zustand",
+  "keywords": [
+    "React",
+    "State-management",
+    "Zustand",
+    "Modular"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/InfiniteXyy/zoov"
   },
   "files": [
     "dist",
+    "src",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch"
+    "prebuild": "rimraf ./dist",
+    "prepare": "npm run build",
+    "build": "rollup -c",
+    "dev": "rollup -c --watch"
   },
   "peerDependencies": {
     "immer": ">=7.0.0",
     "react": ">=16.8.0",
-    "rxjs": ">6.0.0",
+    "rxjs": ">=6.0.0",
     "zustand": ">=3.0.0"
   },
   "devDependencies": {
-    "@types/node": "^14.14.17"
+    "@types/node": "^14.14.17",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.35.1",
+    "rollup-plugin-typescript2": "^0.29.0"
   }
 }
