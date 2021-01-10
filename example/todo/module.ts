@@ -48,4 +48,4 @@ const TodoModule = defineModule()
     },
   }));
 
-export const todoModule = TodoModule.init('todoModule');
+export const todoModule = TodoModule.init({ name: 'todoModule', persist: { name: 'todo', whitelist: ['params'] } });

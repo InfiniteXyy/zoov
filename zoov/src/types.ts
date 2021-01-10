@@ -1,17 +1,7 @@
 import { Observable } from 'rxjs';
 import { Draft } from 'immer';
 import { UseStore } from 'zustand';
-
-type StateStorage = {
-  getItem: (name: string) => string | null | Promise<string | null>;
-  setItem: (name: string, value: string) => void | Promise<void>;
-};
-type PersistOptions<S> = {
-  name: string;
-  storage?: StateStorage;
-  serialize?: (state: S) => string | Promise<string>;
-  deserialize?: (str: string) => S | Promise<S>;
-};
+import type { PersistOptions } from './vendor';
 
 // basic types
 export type StateRecord = Record<string, unknown>;

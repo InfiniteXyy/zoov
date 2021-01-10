@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.0.2",
+  "version": "0.0.3-alpha.0",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/zoov.js",
@@ -36,7 +36,7 @@
     "immer": ">=7.0.0",
     "react": ">=16.8.0",
     "rxjs": ">=6.0.0",
-    "zustand": ">=3.0.0"
+    "zustand": ">=3.3.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",

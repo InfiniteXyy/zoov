@@ -102,6 +102,19 @@ const Module = defineModule()
   }));
 ```
 
+#### Use Persist
+
+```tsx
+// see more in https://github.com/pmndrs/zustand/blob/master/src/middleware.ts#L125
+const module = Module.init({
+  persist: {
+    name: 'module',
+    whiteList: ['shouldPersist'],
+    version: 0,
+  },
+});
+```
+
 ### TodoList
 
 - [x] better Readme
@@ -109,8 +122,8 @@ const Module = defineModule()
 - [x] support redux dev tools
 - [x] refactor with TS
 - [x] Unit Test
-- [ ] Persist helper
-- [ ] computed values should only be triggered once
+- [x] Persist helper
 - [ ] support di?
+- [ ] computed values should only be triggered once
 - [ ] support svelte?
 - [ ] selector in hooks?

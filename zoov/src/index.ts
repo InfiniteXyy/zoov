@@ -1,6 +1,6 @@
 import { extendActions, extendMethods, extendViews, initInstance } from './builders';
 import { omit } from './utils';
-import { Module, ModuleFactory, StateRecord } from './types';
+import type { Module, ModuleFactory, StateRecord } from './types';
 
 const factory = (state: StateRecord, module: Module, excluded: (keyof ModuleFactory)[] = []): ModuleFactory => {
   return {

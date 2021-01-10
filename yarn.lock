@@ -7360,12 +7360,7 @@ yargs@^15.4.1:
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
 
-zoov@0.0.2-alpha.3:
-  version "0.0.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/zoov/-/zoov-0.0.2-alpha.3.tgz#11f48668f0f5518394450017294ec5c72f009a86"
-  integrity sha512-vuNAtjvF9aiiiY/d8JPEXF3F5l9sFyq3wlCp8D5im/z9WjkA6hdAZH8lYEKBYdt9zeN1HR+vPkNR40htCOEcZQ==
-
-zustand@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.2.0.tgz#a718a964440796d44edda3073b69e78b95f4c8f5"
-  integrity sha512-MBYFrnUdgFVi38tdQNSzVN9cPpRDf7w2HhdHGDSgBRHN7vIbUGUR3aBdVQykelXzSFR7iVj3YNBuq7B9ceMI5w==
+zustand@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.3.0.tgz#dc029b8e0ea710a36dda05f5ca147246969a9104"
+  integrity sha512-oTOoJa70tYisd+fRmoIjZKlF21JEmGQ8oC+dJ7pf/wdS4qJPcCS/W9blzKAnyyLMrIYsIl6Mlq5cmili7mpJPw==
