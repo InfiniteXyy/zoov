@@ -16,7 +16,11 @@ export type OmitDraftArg<F> = F extends (draft: Draft<any>, ...args: infer A) =>
 export type ActionBuilder<State> = Record<string, (draft: Draft<State>, ...args: any[]) => void>;
 export type ComputedBuilder<State> = Record<string, (state: State) => any>;
 export type MethodBuilder<State extends StateRecord = {}, Actions = {}, Methods = {}> = (
-  self: Pick<Module<State, Actions, Methods>, 'getState' | 'getState$' | 'getActions'>,
+  perform: {
+    getActions: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<any, infer A, infer M> ? A & M : Actions & Methods;
+    getState: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? S : State;
+    getState$: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? Observable<S> : Observable<State>;
+  },
   effect: EffectBuilder
 ) => Record<any, (...args: any[]) => any>;
 export type MiddlewareBuilder<State extends StateRecord = {}> = (creator: StateCreator<State>) => StateCreator<State>;
@@ -41,16 +45,19 @@ export type ModuleFactory<State extends StateRecord = {}, Actions = {}, Methods 
 };
 
 export type ScopeGetter<State extends StateRecord = any, Actions = {}, Methods = {}> = {
-  getActions: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<any, infer A, infer M> ? A & M : Actions & Methods;
-  getState: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? S : State;
-  getState$: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? Observable<S> : Observable<State>;
+  getActions: () => Actions & Methods;
+  getState: () => State;
+  getState$: () => Observable<State>;
 };
 
 export type Module<State extends StateRecord = {}, Actions = {}, Methods = {}, Computed = {}> = {
-  useActions: () => Actions & Methods;
+  use: <SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>) => [SelectorResult, Actions & Methods];
   useState: <SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>) => SelectorResult;
+  useActions: () => Actions & Methods;
   useComputed: () => Computed;
-} & ScopeGetter<State, Actions, Methods>;
+  useState$: () => Observable<State>;
+  global: ScopeGetter<State, Actions, Methods>;
+};
 
 export type ModuleContext = Map<Module, Scope>;
 

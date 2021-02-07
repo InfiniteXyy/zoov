@@ -12,8 +12,7 @@ const CounterModule = defineModule({ count: 0 })
   .build();
 
 export const BasicUsage: FC = memo(() => {
-  const { count } = CounterModule.useState();
-  const { add, minus } = CounterModule.useActions();
+  const [{ count }, { add, minus }] = CounterModule.use();
   const { doubled } = CounterModule.useComputed();
 
   return (

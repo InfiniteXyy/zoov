@@ -4,6 +4,7 @@ import { BasicUsage } from './basic-usage';
 import { WithMiddleware } from './with-middleware';
 import { WithProvider } from './with-provider';
 import { WithRxJS } from './with-rxjs';
+import { WithSelector } from './with-selector';
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
       <WithMiddleware />
       <WithProvider />
       <WithRxJS />
+      <WithSelector />
     </>
   );
 };
