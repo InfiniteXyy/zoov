@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { Draft } from 'immer';
-import { UseStore } from 'zustand';
+import type { StateSelector } from 'zustand';
+import type { EqualityChecker } from 'zustand/vanilla';
 import type { PersistOptions } from './vendor';
 
 // basic types
@@ -25,7 +26,7 @@ export type GenAction<RawAction> = RawAction extends Record<string, any> ? { [K 
 export type GenComputed<RawComputed> = RawComputed extends Record<string, (...args: any[]) => any> ? { [K in keyof RawComputed]: ReturnType<RawComputed[K]> } : never;
 
 // core
-export type Module<State extends StateRecord = {}> = {
+export type RawModule<State extends StateRecord = {}> = {
   reducers: Record<string, (...args: any) => (state: State) => State>;
   computed: Record<string, (state: State) => any>;
   methodsBuilders: MethodBuilder[];
@@ -35,7 +36,7 @@ export type ModuleFactory<State extends StateRecord = {}, Actions = {}, Methods 
   actions: <A extends ActionBuilder<State>>(actions: A) => Omit<ModuleFactory<State, GenAction<A>, Methods, Computed, ExcludedField | 'actions'>, ExcludedField | 'actions'>;
   computed: <V extends ComputedBuilder<State>>(computed: V) => Omit<ModuleFactory<State, Actions, Methods, GenComputed<V>, ExcludedField | 'computed'>, ExcludedField | 'computed'>;
   methods: <M extends MethodBuilder<State, Actions, Methods>>(methods: M) => ModuleFactory<State, Actions, ReturnType<M> & Methods, Computed, ExcludedField>;
-  init: (options?: InstanceOptions<State> | string) => Instance<State, Actions, Methods, Computed>;
+  build: (options?: InstanceOptions<State> | string) => Module<State, Actions, Methods, Computed>;
 };
 
 export type InstanceOptions<State extends StateRecord> = {
@@ -44,4 +45,12 @@ export type InstanceOptions<State extends StateRecord> = {
   state?: Partial<State>; // instance initial state
 };
 
-export type Instance<State extends StateRecord, Actions, Methods, Computed> = { useActions: () => Actions & Methods; useState: UseStore<State>; useComputed: () => Computed };
+export type Module<State extends StateRecord, Actions, Methods, Computed> = {
+  getActions: () => Actions & Methods;
+  getState: () => State;
+  getState$: () => Observable<State>;
+} & {
+  useActions: () => Actions & Methods;
+  useState: <SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>) => SelectorResult;
+  useComputed: () => Computed;
+};

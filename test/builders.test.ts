@@ -1,10 +1,10 @@
-import { extendMethods, extendComputed, extendActions, initInstance } from '../src/builders';
-import { Module } from '../src/types';
+import { extendMethods, extendComputed, extendActions, buildModule } from '../src/builders';
+import { RawModule } from '../src/types';
 
 type State = { count: number };
 
 describe('test builders', function () {
-  const emptyModule: Module = { reducers: {}, methodsBuilders: [], computed: {} };
+  const emptyModule: RawModule = { reducers: {}, methodsBuilders: [], computed: {} };
 
   it('should extendComputed work', function () {
     const computed = { doubled: (state: State) => state.count * 2 };
@@ -37,12 +37,12 @@ describe('test builders', function () {
   it('should init instance correct', function () {
     const state: State = { count: 0 };
 
-    const module: Module<State> = {
+    const module: RawModule<State> = {
       methodsBuilders: [() => ({ hello: () => console.log('Hello') })],
       reducers: { increase: () => (state) => state },
       computed: { doubled: (state) => state.count * 2 },
     };
-    const instance = initInstance(state, module)();
+    const instance = buildModule(state, module)();
     const { hello, increase } = instance.useActions();
     expect(typeof hello).toBe('function');
     expect(typeof increase()).not.toBe('function');

@@ -1,30 +1,35 @@
 import produce from 'immer';
-import create, { StateCreator, UseStore } from 'zustand';
+import create, { StateCreator, StateSelector, UseStore } from 'zustand';
+import { Observable } from 'rxjs';
 import { devtools, redux, persist as persistMiddleware } from 'zustand/middleware';
 import { effect } from './utils';
-import { ActionsRecord, InstanceOptions, MethodBuilder, Module, ScopeReducer, StateRecord, ComputedRecord } from './types';
+import type { ActionsRecord, InstanceOptions, MethodBuilder, RawModule, ScopeReducer, StateRecord, ComputedRecord } from './types';
+import type { EqualityChecker } from 'zustand/vanilla';
 
-export const extendActions = (actions: ActionsRecord) => (module: Module): Module => {
+export const extendActions = (actions: ActionsRecord) => (rawModule: RawModule): RawModule => {
   const reducers: any = {};
   Object.keys(actions).forEach((key) => {
     reducers[key] = (...args: any[]) => produce((draft) => void actions[key](draft, ...args));
   });
-  return { ...module, reducers };
+  return { ...rawModule, reducers };
 };
 
-export const extendComputed = (computed: ComputedRecord) => (module: Module): Module => ({ ...module, computed });
-
-export const extendMethods = (builder: MethodBuilder) => (module: Module): Module => ({
-  ...module,
-  methodsBuilders: [...module.methodsBuilders, builder],
+export const extendComputed = (computed: ComputedRecord) => (rawModule: RawModule): RawModule => ({
+  ...rawModule,
+  computed,
 });
 
-export const initInstance = <State extends StateRecord>(state: State, module: Module<State>) => (_options: InstanceOptions<State> | string = {}) => {
+export const extendMethods = (builder: MethodBuilder) => (rawModule: RawModule): RawModule => ({
+  ...rawModule,
+  methodsBuilders: [...rawModule.methodsBuilders, builder],
+});
+
+export const buildModule = <State extends StateRecord>(state: State, rawModule: RawModule<State>) => (_options: InstanceOptions<State> | string = {}) => {
   const options = typeof _options === 'string' ? { name: _options } : _options;
   const { persist, name: moduleName, state: currentState = {} } = options;
   const isDev = process.env.NODE_ENV === 'development';
 
-  const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => module.reducers[type](...payload)(state);
+  const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
   let stateCreator: StateCreator<State> = redux(scopeReducer, { ...state, ...currentState });
   if (persist) stateCreator = persistMiddleware(stateCreator, persist);
   if (isDev) stateCreator = devtools(stateCreator, moduleName);
@@ -37,24 +42,27 @@ export const initInstance = <State extends StateRecord>(state: State, module: Mo
 
   // bind Actions with dispatch, build methods
   const dispatch = scope.store.getState().dispatch as (payload: { type: keyof ActionsRecord; payload: any }) => void;
-  Object.keys(module.reducers).forEach((key) => {
+  Object.keys(rawModule.reducers).forEach((key) => {
     scope.actions[key] = (...args) => dispatch({ type: key, payload: args });
   });
   const self = { getActions: () => scope.actions, getState: () => scope.store.getState() };
-  module.methodsBuilders.forEach((builder) => {
+  rawModule.methodsBuilders.forEach((builder) => {
     scope.actions = { ...scope.actions, ...builder(self, effect) };
   });
 
   // bind Computed
-  Object.keys(module.computed).forEach((key) => {
+  Object.keys(rawModule.computed).forEach((key) => {
     Object.defineProperty(scope.computed, key, {
-      get: () => scope.store(module.computed[key]),
+      get: () => scope.store(rawModule.computed[key]),
     });
   });
 
   return {
     useActions: () => scope.actions,
     useComputed: () => scope.computed,
-    useState: scope.store,
+    useState: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => scope.store(selector, equalFn),
+    getState: scope.store.getState,
+    getActions: () => scope.actions,
+    getState$: () => new Observable<State>((subscriber) => scope.store.subscribe((state) => subscriber.next(state))),
   };
 };
