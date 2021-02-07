@@ -1,11 +1,15 @@
 node_modules
 
+# editor
 .vscode
 .idea
 
+# OS
 .DS_Store
 
-# will automatically be copied from home dir before publish
-zoov/README.md
-zoov/dist
-zoov/coverage
+# build
+dist
+coverage
+
+# parcel
+.cache
