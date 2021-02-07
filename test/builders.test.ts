@@ -1,4 +1,4 @@
-import { extendMethods, extendViews, extendActions, initInstance } from '../src/builders';
+import { extendMethods, extendComputed, extendActions, initInstance } from '../src/builders';
 import { Module } from '../src/types';
 
 type State = { count: number };
@@ -6,12 +6,12 @@ type State = { count: number };
 describe('test builders', function () {
   const emptyModule: Module = { reducers: {}, methodsBuilders: [], computed: {} };
 
-  it('should extendViews work', function () {
-    const views = { doubled: (state: State) => state.count * 2 };
+  it('should extendComputed work', function () {
+    const computed = { doubled: (state: State) => state.count * 2 };
     const module = { ...emptyModule };
-    const extender = extendViews(views);
+    const extender = extendComputed(computed);
     const newModule = extender(module);
-    expect(newModule.computed).toStrictEqual(views);
+    expect(newModule.computed).toStrictEqual(computed);
     expect(module).toStrictEqual(emptyModule);
   });
 
@@ -46,7 +46,5 @@ describe('test builders', function () {
     const { hello, increase } = instance.useActions();
     expect(typeof hello).toBe('function');
     expect(typeof increase()).not.toBe('function');
-    expect(Object.keys(instance)).toContain('useDoubled');
-    expect(Object.keys(instance)).toContain('useCount');
   });
 });

@@ -1,8 +1,8 @@
 import produce from 'immer';
 import create, { StateCreator, UseStore } from 'zustand';
 import { devtools, redux, persist as persistMiddleware } from 'zustand/middleware';
-import { capitalize, effect } from './utils';
-import { ActionsRecord, InstanceOptions, MethodBuilder, Module, ScopeReducer, StateRecord, ViewsRecord } from './types';
+import { effect } from './utils';
+import { ActionsRecord, InstanceOptions, MethodBuilder, Module, ScopeReducer, StateRecord, ComputedRecord } from './types';
 
 export const extendActions = (actions: ActionsRecord) => (module: Module): Module => {
   const reducers: any = {};
@@ -12,9 +12,12 @@ export const extendActions = (actions: ActionsRecord) => (module: Module): Modul
   return { ...module, reducers };
 };
 
-export const extendViews = (views: ViewsRecord) => (module: Module): Module => ({ ...module, computed: views });
+export const extendComputed = (computed: ComputedRecord) => (module: Module): Module => ({ ...module, computed });
 
-export const extendMethods = (builder: MethodBuilder) => (module: Module): Module => ({ ...module, methodsBuilders: [...module.methodsBuilders, builder] });
+export const extendMethods = (builder: MethodBuilder) => (module: Module): Module => ({
+  ...module,
+  methodsBuilders: [...module.methodsBuilders, builder],
+});
 
 export const initInstance = <State extends StateRecord>(state: State, module: Module<State>) => (_options: InstanceOptions<State> | string = {}) => {
   const options = typeof _options === 'string' ? { name: _options } : _options;
@@ -26,10 +29,10 @@ export const initInstance = <State extends StateRecord>(state: State, module: Mo
   if (persist) stateCreator = persistMiddleware(stateCreator, persist);
   if (isDev) stateCreator = devtools(stateCreator, moduleName);
 
-  const scope: { store: UseStore<State>; actions: ActionsRecord; stateHooks: ViewsRecord } = {
+  const scope: { store: UseStore<State>; actions: ActionsRecord; computed: ComputedRecord } = {
     store: create(stateCreator),
     actions: {},
-    stateHooks: {},
+    computed: {},
   };
 
   // bind Actions with dispatch, build methods
@@ -41,17 +44,17 @@ export const initInstance = <State extends StateRecord>(state: State, module: Mo
   module.methodsBuilders.forEach((builder) => {
     scope.actions = { ...scope.actions, ...builder(self, effect) };
   });
-  // generate state, view hooks
-  Object.keys(state).forEach((key) => {
-    const selector = (state: State) => state[key];
-    scope.stateHooks[`use${capitalize(key)}`] = () => scope.store(selector);
-  });
+
+  // bind Computed
   Object.keys(module.computed).forEach((key) => {
-    scope.stateHooks[`use${capitalize(key)}`] = () => scope.store(module.computed[key]);
+    Object.defineProperty(scope.computed, key, {
+      get: () => scope.store(module.computed[key]),
+    });
   });
+
   return {
-    ...scope.stateHooks,
     useActions: () => scope.actions,
+    useComputed: () => scope.computed,
     useState: scope.store,
   };
 };

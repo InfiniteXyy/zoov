@@ -1,10 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import { Counter } from './counter';
-// import { TodoList } from './todo';
+import { BasicUsage } from './basic-usage';
 
 const App = () => {
-  return <div>123</div>;
+  return (
+    <>
+      <BasicUsage />
+    </>
+  );
 };
 
 ReactDOM.render(<App />, document.getElementById('root'));

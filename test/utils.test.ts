@@ -1,12 +1,7 @@
 import { map } from 'rxjs/operators';
-import { capitalize, omit, effect } from '../src/utils';
+import { omit, effect } from '../src/utils';
 
 describe('test utils', function () {
-  it('should capitalize correct', function () {
-    expect(capitalize('count')).toBe('Count');
-    expect(capitalize('Capitalized')).toBe('Capitalized');
-  });
-
   it('should omit work', function () {
     const empty: any = {};
     expect(omit(empty, ['123'])).toEqual({});
