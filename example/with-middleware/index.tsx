@@ -34,7 +34,7 @@ export const WithMiddleware: FC = memo(() => {
 
   return (
     <div>
-      <h3>WithMiddleware</h3>
+      <h3>With Middleware (persist & log)</h3>
       <p>
         count: <b>{count}</b>
       </p>

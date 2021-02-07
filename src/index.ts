@@ -1,5 +1,6 @@
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
 import { omit } from './utils';
+import { defineProvider } from './scope';
 import type { ModuleFactory, RawModule, StateRecord } from './types';
 
 const factory = (state: StateRecord, rawModule: RawModule, excluded: (keyof ModuleFactory)[] = []): ModuleFactory => {
@@ -31,4 +32,4 @@ const defineModule = <State extends StateRecord>(defaultState: State): ModuleFac
   }) as ModuleFactory<State>;
 };
 
-export { defineModule };
+export { defineModule, defineProvider };

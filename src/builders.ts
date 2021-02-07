@@ -1,10 +1,10 @@
 import produce from 'immer';
-import create, { StateCreator, StateSelector, UseStore } from 'zustand';
+import create, { EqualityChecker, StateCreator, StateSelector } from 'zustand';
 import { Observable } from 'rxjs';
 import { redux } from 'zustand/middleware';
-import type { EqualityChecker } from 'zustand/vanilla';
-import { effect } from './utils';
-import type { ActionsRecord, MethodBuilder, RawModule, ScopeReducer, StateRecord, ComputedRecord, MiddlewareBuilder } from './types';
+import { effect, pick } from './utils';
+import { BuildScopeSymbol, ModuleProviderOption, useScopeOr } from './scope';
+import { ActionsRecord, ComputedRecord, MethodBuilder, MiddlewareBuilder, Module, ModuleContext, RawModule, Scope, ScopeReducer, StateRecord } from './types';
 
 export const extendActions = (actions: ActionsRecord) => (rawModule: RawModule): RawModule => {
   const reducers: any = {};
@@ -30,38 +30,68 @@ export const extendMiddleware = (middleware: MiddlewareBuilder) => (rawModule: R
 });
 
 export const buildModule = <State extends StateRecord>(state: State, rawModule: RawModule<State>) => () => {
-  const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
-  const stateCreator: StateCreator<State> = redux(scopeReducer, { ...state });
+  const scopeBuilder = (props: ModuleProviderOption<State> & { getContext?: () => ModuleContext }): Scope<State> => {
+    const { defaultValue = {}, middleware, getContext } = props;
 
-  const scope: { store: UseStore<State>; actions: ActionsRecord; computed: ComputedRecord } = {
-    store: create(rawModule.middlewares.reduce((acc, middleware) => middleware(acc), stateCreator)),
-    actions: {},
-    computed: {},
-  };
+    const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
+    const stateCreator: StateCreator<State> = redux(scopeReducer, { ...state, ...defaultValue });
 
-  // bind Actions with dispatch, build methods
-  const dispatch = scope.store.getState().dispatch as (payload: { type: keyof ActionsRecord; payload: any }) => void;
-  Object.keys(rawModule.reducers).forEach((key) => {
-    scope.actions[key] = (...args) => dispatch({ type: key, payload: args });
-  });
-  const self = { getActions: () => scope.actions, getState: () => scope.store.getState() };
-  rawModule.methodsBuilders.forEach((builder) => {
-    scope.actions = { ...scope.actions, ...builder(self, effect) };
-  });
+    const middlewares = middleware ? [middleware] : rawModule.middlewares;
 
-  // bind Computed
-  Object.keys(rawModule.computed).forEach((key) => {
-    Object.defineProperty(scope.computed, key, {
-      get: () => scope.store(rawModule.computed[key]),
+    const self: Scope<State> = {
+      state$: null,
+      store: create(middlewares.reduce((acc, middleware) => middleware(acc), stateCreator)),
+      actions: {},
+      computed: {},
+      getState: (module?: Module) => {
+        if (!module) return self.store.getState();
+        const scope = getContext?.().get(module);
+        return (scope ? scope.getState() : module.getState()) as any;
+      },
+      getActions: (module?: Module) => {
+        if (!module) return self.actions;
+        const scope = getContext?.().get(module);
+        return (scope ? scope.getActions() : module.getActions()) as any;
+      },
+      getState$: (module?: Module) => {
+        if (!module) {
+          if (!self.state$) self.state$ = new Observable<State>((subscriber) => self.store.subscribe((state) => subscriber.next(state)));
+          return self.state$;
+        }
+        const scope = getContext?.().get(module);
+        return (scope ? scope.getState$() : module.getState$()) as any;
+      },
+    };
+
+    // bind Actions with dispatch, build methods
+    const dispatch = self.store.getState().dispatch as (payload: { type: keyof ActionsRecord; payload: any }) => void;
+    Object.keys(rawModule.reducers).forEach((key) => {
+      self.actions[key] = (...args) => dispatch({ type: key, payload: args });
     });
-  });
 
-  return {
-    useActions: () => scope.actions,
-    useComputed: () => scope.computed,
-    useState: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => scope.store(selector, equalFn),
-    getState: scope.store.getState,
-    getActions: () => scope.actions,
-    getState$: () => new Observable<State>((subscriber) => scope.store.subscribe((state) => subscriber.next(state))),
+    rawModule.methodsBuilders.forEach((builder) => {
+      self.actions = { ...self.actions, ...builder({ ...pick(self, ['getState', 'getState$', 'getActions']) }, effect) };
+    });
+
+    // bind Computed
+    Object.keys(rawModule.computed).forEach((key) => {
+      Object.defineProperty(self.computed, key, {
+        get: () => self.store(rawModule.computed[key]),
+      });
+    });
+    return self;
   };
+
+  const globalScope = scopeBuilder({});
+  const getScope = () => useScopeOr(module, globalScope);
+
+  const module = {
+    useState: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => getScope().store(selector, equalFn),
+    useComputed: () => getScope().computed,
+    useActions: () => getScope().actions,
+    ...pick(globalScope, ['getState', 'getState$', 'getActions']),
+    [BuildScopeSymbol]: scopeBuilder,
+  } as Module<State>;
+
+  return module;
 };

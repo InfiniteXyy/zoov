@@ -1,9 +1,9 @@
 import type { Observable } from 'rxjs';
 import type { Draft } from 'immer';
-import type { StateSelector, StateCreator, EqualityChecker } from 'zustand';
+import type { StateSelector, StateCreator, EqualityChecker, UseStore } from 'zustand';
 
 // basic types
-export type StateRecord = Record<string, unknown>;
+export type StateRecord = Record<string, any>;
 export type ActionsRecord = Record<string, (...args: any) => void>;
 export type ComputedRecord = Record<string, (state: any) => any>;
 
@@ -16,7 +16,7 @@ export type OmitDraftArg<F> = F extends (draft: Draft<any>, ...args: infer A) =>
 export type ActionBuilder<State> = Record<string, (draft: Draft<State>, ...args: any[]) => void>;
 export type ComputedBuilder<State> = Record<string, (state: State) => any>;
 export type MethodBuilder<State extends StateRecord = {}, Actions = {}, Methods = {}> = (
-  self: { getActions: () => Actions & Methods; getState: () => State },
+  self: Pick<Module<State, Actions, Methods>, 'getState' | 'getState$' | 'getActions'>,
   effect: EffectBuilder
 ) => Record<any, (...args: any[]) => any>;
 export type MiddlewareBuilder<State extends StateRecord = {}> = (creator: StateCreator<State>) => StateCreator<State>;
@@ -40,12 +40,23 @@ export type ModuleFactory<State extends StateRecord = {}, Actions = {}, Methods 
   build: () => Module<State, Actions, Methods, Computed>;
 };
 
-export type Module<State extends StateRecord, Actions, Methods, Computed> = {
-  getActions: () => Actions & Methods;
-  getState: () => State;
-  getState$: () => Observable<State>;
-} & {
+export type ScopeGetter<State extends StateRecord = any, Actions = {}, Methods = {}> = {
+  getActions: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<any, infer A, infer M> ? A & M : Actions & Methods;
+  getState: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? S : State;
+  getState$: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? Observable<S> : Observable<State>;
+};
+
+export type Module<State extends StateRecord = {}, Actions = {}, Methods = {}, Computed = {}> = {
   useActions: () => Actions & Methods;
   useState: <SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>) => SelectorResult;
   useComputed: () => Computed;
-};
+} & ScopeGetter<State, Actions, Methods>;
+
+export type ModuleContext = Map<Module, Scope>;
+
+export type Scope<State extends StateRecord = {}, Actions = {}, Methods = {}> = {
+  store: UseStore<State>;
+  actions: ActionsRecord;
+  computed: ComputedRecord;
+  state$: Observable<State> | null;
+} & ScopeGetter<State, Actions, Methods>;
