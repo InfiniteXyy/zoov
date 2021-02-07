@@ -1,10 +1,10 @@
 import produce from 'immer';
 import create, { StateCreator, StateSelector, UseStore } from 'zustand';
 import { Observable } from 'rxjs';
-import { devtools, redux, persist as persistMiddleware } from 'zustand/middleware';
-import { effect } from './utils';
-import type { ActionsRecord, InstanceOptions, MethodBuilder, RawModule, ScopeReducer, StateRecord, ComputedRecord } from './types';
+import { redux } from 'zustand/middleware';
 import type { EqualityChecker } from 'zustand/vanilla';
+import { effect } from './utils';
+import type { ActionsRecord, MethodBuilder, RawModule, ScopeReducer, StateRecord, ComputedRecord, MiddlewareBuilder } from './types';
 
 export const extendActions = (actions: ActionsRecord) => (rawModule: RawModule): RawModule => {
   const reducers: any = {};
@@ -24,18 +24,17 @@ export const extendMethods = (builder: MethodBuilder) => (rawModule: RawModule):
   methodsBuilders: [...rawModule.methodsBuilders, builder],
 });
 
-export const buildModule = <State extends StateRecord>(state: State, rawModule: RawModule<State>) => (_options: InstanceOptions<State> | string = {}) => {
-  const options = typeof _options === 'string' ? { name: _options } : _options;
-  const { persist, name: moduleName, state: currentState = {} } = options;
-  const isDev = process.env.NODE_ENV === 'development';
+export const extendMiddleware = (middleware: MiddlewareBuilder) => (rawModule: RawModule): RawModule => ({
+  ...rawModule,
+  middlewares: [...rawModule.middlewares, middleware],
+});
 
+export const buildModule = <State extends StateRecord>(state: State, rawModule: RawModule<State>) => () => {
   const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
-  let stateCreator: StateCreator<State> = redux(scopeReducer, { ...state, ...currentState });
-  if (persist) stateCreator = persistMiddleware(stateCreator, persist);
-  if (isDev) stateCreator = devtools(stateCreator, moduleName);
+  const stateCreator: StateCreator<State> = redux(scopeReducer, { ...state });
 
   const scope: { store: UseStore<State>; actions: ActionsRecord; computed: ComputedRecord } = {
-    store: create(stateCreator),
+    store: create(rawModule.middlewares.reduce((acc, middleware) => middleware(acc), stateCreator)),
     actions: {},
     computed: {},
   };

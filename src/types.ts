@@ -1,8 +1,6 @@
-import { Observable } from 'rxjs';
-import { Draft } from 'immer';
-import type { StateSelector } from 'zustand';
-import type { EqualityChecker } from 'zustand/vanilla';
-import type { PersistOptions } from './vendor';
+import type { Observable } from 'rxjs';
+import type { Draft } from 'immer';
+import type { StateSelector, StateCreator, EqualityChecker } from 'zustand';
 
 // basic types
 export type StateRecord = Record<string, unknown>;
@@ -21,6 +19,7 @@ export type MethodBuilder<State extends StateRecord = {}, Actions = {}, Methods 
   self: { getActions: () => Actions & Methods; getState: () => State },
   effect: EffectBuilder
 ) => Record<any, (...args: any[]) => any>;
+export type MiddlewareBuilder<State extends StateRecord = {}> = (creator: StateCreator<State>) => StateCreator<State>;
 
 export type GenAction<RawAction> = RawAction extends Record<string, any> ? { [K in keyof RawAction]: OmitDraftArg<RawAction[K]> } : never;
 export type GenComputed<RawComputed> = RawComputed extends Record<string, (...args: any[]) => any> ? { [K in keyof RawComputed]: ReturnType<RawComputed[K]> } : never;
@@ -30,19 +29,15 @@ export type RawModule<State extends StateRecord = {}> = {
   reducers: Record<string, (...args: any) => (state: State) => State>;
   computed: Record<string, (state: State) => any>;
   methodsBuilders: MethodBuilder[];
+  middlewares: MiddlewareBuilder<State>[];
 };
 
 export type ModuleFactory<State extends StateRecord = {}, Actions = {}, Methods = {}, Computed = {}, ExcludedField extends string = never> = {
   actions: <A extends ActionBuilder<State>>(actions: A) => Omit<ModuleFactory<State, GenAction<A>, Methods, Computed, ExcludedField | 'actions'>, ExcludedField | 'actions'>;
   computed: <V extends ComputedBuilder<State>>(computed: V) => Omit<ModuleFactory<State, Actions, Methods, GenComputed<V>, ExcludedField | 'computed'>, ExcludedField | 'computed'>;
-  methods: <M extends MethodBuilder<State, Actions, Methods>>(methods: M) => ModuleFactory<State, Actions, ReturnType<M> & Methods, Computed, ExcludedField>;
-  build: (options?: InstanceOptions<State> | string) => Module<State, Actions, Methods, Computed>;
-};
-
-export type InstanceOptions<State extends StateRecord> = {
-  name?: string; // used for redux dev tools
-  persist?: PersistOptions<State>; // persist items in local storage
-  state?: Partial<State>; // instance initial state
+  methods: <M extends MethodBuilder<State, Actions, Methods>>(methods: M) => Omit<ModuleFactory<State, Actions, ReturnType<M> & Methods, Computed, ExcludedField>, ExcludedField>;
+  middleware: <M extends MiddlewareBuilder<State>>(middleware: M) => Omit<ModuleFactory<State, Actions, Methods, Computed, ExcludedField>, ExcludedField>;
+  build: () => Module<State, Actions, Methods, Computed>;
 };
 
 export type Module<State extends StateRecord, Actions, Methods, Computed> = {

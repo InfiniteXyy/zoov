@@ -4,7 +4,7 @@ import { RawModule } from '../src/types';
 type State = { count: number };
 
 describe('test builders', function () {
-  const emptyModule: RawModule = { reducers: {}, methodsBuilders: [], computed: {} };
+  const emptyModule: RawModule = { reducers: {}, methodsBuilders: [], computed: {}, middlewares: [] };
 
   it('should extendComputed work', function () {
     const computed = { doubled: (state: State) => state.count * 2 };
@@ -41,6 +41,7 @@ describe('test builders', function () {
       methodsBuilders: [() => ({ hello: () => console.log('Hello') })],
       reducers: { increase: () => (state) => state },
       computed: { doubled: (state) => state.count * 2 },
+      middlewares: [],
     };
     const instance = buildModule(state, module)();
     const { hello, increase } = instance.useActions();
