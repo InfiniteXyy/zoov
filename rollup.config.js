@@ -13,7 +13,7 @@ const options = {
       useTsconfigDeclarationDir: true,
     }),
   ],
-  external: ['zustand', 'zustand/middleware', 'rxjs', 'immer'],
+  external: ['zustand', 'zustand/middleware', 'rxjs', 'immer', 'react'],
 };
 
 export default options;

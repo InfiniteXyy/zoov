@@ -4,14 +4,15 @@ import { ScopeContext, Module, Scope, ScopeBuildOption } from './types';
 type HandlerOption<M> = M extends Module<infer State> ? ScopeBuildOption<State> : never;
 type Handler = (handle: <M extends Module>(module: M, options: HandlerOption<M>) => void) => void;
 
+export const BuildScopeSymbol = Symbol('build-scope');
 const scopeContext = React.createContext<ScopeContext>(new Map<Module, Scope>());
 
-export const BuildScopeSymbol = Symbol('build-scope');
+type ScopeBuilder = { [BuildScopeSymbol]: (options: ScopeBuildOption<any>) => Scope };
 
 export const defineProvider = (handler: Handler) => {
   const providerScopeMap = new Map<Module, Scope>();
   handler((module, options) => {
-    providerScopeMap.set(module, module[BuildScopeSymbol]({ ...options }));
+    providerScopeMap.set(module, ((module as unknown) as ScopeBuilder)[BuildScopeSymbol]({ ...options }));
   });
   return ({ children }: { children: React.ReactNode }) => {
     const scopeMap = React.useContext(scopeContext);

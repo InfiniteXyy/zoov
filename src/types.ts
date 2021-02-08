@@ -1,7 +1,6 @@
 import type { Observable } from 'rxjs';
 import type { Draft } from 'immer';
 import type { StateSelector, StateCreator, EqualityChecker, UseStore } from 'zustand';
-import type { BuildScopeSymbol } from './context';
 
 // basic types
 export type StateRecord = Record<string, any>;
@@ -13,9 +12,9 @@ export type ScopeReducer<State extends StateRecord> = (state: State, action: { t
 export type EffectBuilder = <T>(builder: (payload$: Observable<T>) => Observable<unknown>) => (payload: T) => void;
 export type OmitDraftArg<F> = F extends (draft: Draft<any>, ...args: infer A) => void ? (...args: A) => void : never;
 export type Perform<State extends StateRecord = {}, Actions = {}, Methods = {}> = {
-  getActions: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<any, infer A, infer M> ? A & M : never;
-  getState: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? S : never;
-  getState$: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? Observable<S> : never;
+  getActions<M extends Module = Module<State, Actions, Methods>>(module?: M): M extends Module<any, infer A, infer M> ? A & M : never;
+  getState<M extends Module = Module<State, Actions, Methods>>(module?: M): M extends Module<infer S> ? S : never;
+  getState$<M extends Module = Module<State, Actions, Methods>>(module?: M): M extends Module<infer S> ? Observable<S> : never;
 };
 
 // builder types
@@ -55,15 +54,14 @@ export type Module<State extends StateRecord = {}, Actions = {}, Methods = {}, C
   useComputed: () => Computed;
   useState$: () => Observable<State>;
   global: Scope<State, Actions, Methods>;
-  [BuildScopeSymbol]: (option: ScopeBuildOption<any>) => Scope;
 };
 
 export type ScopeContext = Map<Module, Scope>;
 
 export type Scope<State extends StateRecord = {}, Actions = {}, Methods = {}, Computed = {}> = {
   store: UseStore<State>;
-  getActions: (context?: ScopeContext) => Actions & Methods;
-  getComputed: () => Computed;
-  getState: () => State;
-  getState$: () => Observable<State>;
+  getActions(context?: ScopeContext): Actions & Methods;
+  getComputed(): Computed;
+  getState(): State;
+  getState$(): Observable<State>;
 };

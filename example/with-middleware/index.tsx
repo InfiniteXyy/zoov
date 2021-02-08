@@ -1,6 +1,5 @@
 import React, { FC, memo } from 'react';
 import { defineModule } from '../../src';
-import { persist } from 'zustand/middleware';
 import type { MiddlewareBuilder } from '../../src/types';
 
 type State = { count: number };
@@ -12,10 +11,7 @@ const log: MiddlewareBuilder<State> = (config) => (set, get, api) =>
       set(args);
       console.log('> set state', get());
     },
-    () => {
-      console.log('getting state');
-      return get();
-    },
+    get,
     api
   );
 
@@ -24,17 +20,15 @@ const CounterModule = defineModule<State>({ count: 0 })
     add: (draft) => draft.count++,
     reset: (draft) => (draft.count = 0),
   })
-  .middleware((store) => persist(store, { name: 'counter' }))
   .middleware((store) => log(store))
   .build();
 
 export const WithMiddleware: FC = memo(() => {
-  const { count } = CounterModule.useState();
-  const { add, reset } = CounterModule.useActions();
+  const [{ count }, { add, reset }] = CounterModule.use();
 
   return (
     <div>
-      <h3>With Middleware (persist & log)</h3>
+      <h3>With Middleware (custom log middleware)</h3>
       <p>
         count: <b>{count}</b>
       </p>
