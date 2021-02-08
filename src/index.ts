@@ -14,10 +14,10 @@ const factory = (state: StateRecord, rawModule: RawModule, excluded: (keyof Modu
       return omit(factory(state, extendComputed(computed)(rawModule), _excluded), _excluded);
     },
     methods: (methods) => {
-      return factory(state, extendMethods(methods)(rawModule), excluded);
+      return omit(factory(state, extendMethods(methods)(rawModule), excluded), excluded);
     },
     middleware: (middleware) => {
-      return factory(state, extendMiddleware(middleware)(rawModule), excluded);
+      return omit(factory(state, extendMiddleware(middleware)(rawModule), excluded), excluded);
     },
     build: buildModule(state, rawModule),
   } as ModuleFactory;

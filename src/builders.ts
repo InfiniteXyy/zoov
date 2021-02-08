@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { redux } from 'zustand/middleware';
 import { effect, pick } from './utils';
 import { BuildScopeSymbol, ModuleProviderOption, useScopeOr } from './scope';
-import { ActionsRecord, ComputedRecord, MethodBuilder, MiddlewareBuilder, Module, ModuleContext, RawModule, Scope, ScopeReducer, StateRecord } from './types';
+import { ActionsRecord, ComputedRecord, MethodBuilder, MiddlewareBuilder, Module, ModuleContext, RawModule, Scope, ScopeGetter, ScopeReducer, StateRecord } from './types';
 
 export const extendActions = (actions: ActionsRecord) => (rawModule: RawModule): RawModule => {
   const reducers: any = {};
@@ -54,10 +54,9 @@ export const buildModule = <State extends StateRecord>(state: State, rawModule: 
     Object.keys(rawModule.reducers).forEach((key) => {
       self.actions[key] = (...args) => dispatch({ type: key, payload: args });
     });
-    const getScope = (module?: Module): Scope => {
+    const getScope = (module?: Module): ScopeGetter => {
       if (!module) return self;
-      const context = getContext?.();
-      return (context?.get(module) || module.global) as Scope;
+      return getContext?.()?.get(module) || module.global;
     };
     const performerBuilder = (): any => ({
       getState: (module?: Module) => getScope(module).getState(),
