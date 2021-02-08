@@ -1,6 +1,7 @@
 import type { Observable } from 'rxjs';
 import type { Draft } from 'immer';
 import type { StateSelector, StateCreator, EqualityChecker, UseStore } from 'zustand';
+import type { BuildScopeSymbol } from './context';
 
 // basic types
 export type StateRecord = Record<string, any>;
@@ -11,16 +12,17 @@ export type ComputedRecord = Record<string, (state: any) => any>;
 export type ScopeReducer<State extends StateRecord> = (state: State, action: { type: keyof ActionsRecord; payload: any }) => State;
 export type EffectBuilder = <T>(builder: (payload$: Observable<T>) => Observable<unknown>) => (payload: T) => void;
 export type OmitDraftArg<F> = F extends (draft: Draft<any>, ...args: infer A) => void ? (...args: A) => void : never;
+export type Perform<State extends StateRecord = {}, Actions = {}, Methods = {}> = {
+  getActions: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<any, infer A, infer M> ? A & M : never;
+  getState: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? S : never;
+  getState$: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? Observable<S> : never;
+};
 
 // builder types
 export type ActionBuilder<State> = Record<string, (draft: Draft<State>, ...args: any[]) => void>;
 export type ComputedBuilder<State> = Record<string, (state: State) => any>;
 export type MethodBuilder<State extends StateRecord = {}, Actions = {}, Methods = {}> = (
-  perform: {
-    getActions: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<any, infer A, infer M> ? A & M : Actions & Methods;
-    getState: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? S : State;
-    getState$: <M extends Module = Module<State, Actions, Methods>>(module?: M) => M extends Module<infer S> ? Observable<S> : Observable<State>;
-  },
+  perform: Perform<State, Actions, Methods>,
   effect: EffectBuilder
 ) => Record<any, (...args: any[]) => any>;
 export type MiddlewareBuilder<State extends StateRecord = {}> = (creator: StateCreator<State>) => StateCreator<State>;
@@ -44,11 +46,7 @@ export type ModuleFactory<State extends StateRecord = {}, Actions = {}, Methods 
   build: () => Module<State, Actions, Methods, Computed>;
 };
 
-export type ScopeGetter<State extends StateRecord = any, Actions = {}, Methods = {}> = {
-  getActions: () => Actions & Methods;
-  getState: () => State;
-  getState$: () => Observable<State>;
-};
+export type ScopeBuildOption<State> = { defaultValue?: Partial<State>; middleware?: MiddlewareBuilder<State> };
 
 export type Module<State extends StateRecord = {}, Actions = {}, Methods = {}, Computed = {}> = {
   use: <SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>) => [SelectorResult, Actions & Methods];
@@ -56,14 +54,16 @@ export type Module<State extends StateRecord = {}, Actions = {}, Methods = {}, C
   useActions: () => Actions & Methods;
   useComputed: () => Computed;
   useState$: () => Observable<State>;
-  global: ScopeGetter<State, Actions, Methods>;
+  global: Scope<State, Actions, Methods>;
+  [BuildScopeSymbol]: (option: ScopeBuildOption<any>) => Scope;
 };
 
-export type ModuleContext = Map<Module, Scope>;
+export type ScopeContext = Map<Module, Scope>;
 
-export type Scope<State extends StateRecord = {}, Actions = {}, Methods = {}> = {
+export type Scope<State extends StateRecord = {}, Actions = {}, Methods = {}, Computed = {}> = {
   store: UseStore<State>;
-  actions: ActionsRecord;
-  computed: ComputedRecord;
-  state$: Observable<State> | null;
-} & ScopeGetter<State, Actions, Methods>;
+  getActions: (context?: ScopeContext) => Actions & Methods;
+  getComputed: () => Computed;
+  getState: () => State;
+  getState$: () => Observable<State>;
+};

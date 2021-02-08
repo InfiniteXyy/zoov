@@ -2,7 +2,7 @@ import React, { FC, memo } from 'react';
 import { defineModule, defineProvider } from '../../src';
 import { persist } from 'zustand/middleware';
 
-const LogModule = defineModule({ prefix: 'global provider: ' })
+const LogModule = defineModule({ prefix: 'global log: ' })
   .methods(({ getState }) => ({
     log: (value: string | number) => console.log(`${getState().prefix}${value}`),
   }))
@@ -23,10 +23,13 @@ const CounterModule = defineModule({ count: 0 })
   }))
   .build();
 
-const CustomProvider = defineProvider((handle) => {
+const LogProvider = defineProvider((handle) => {
   handle(LogModule, {
-    defaultValue: { prefix: 'custom provider: ' },
+    defaultValue: { prefix: 'custom log: ' },
   });
+});
+
+const CounterProvider = defineProvider((handle) => {
   handle(CounterModule, {
     defaultValue: { count: 1 },
     middleware: (store) => persist(store, { name: 'count2' }),
@@ -50,11 +53,16 @@ export const WithProvider: FC = memo(() => {
   return (
     <div>
       <h3>With Provider</h3>
-      <div style={{ display: 'flex' }}>
-        <Counter title={'global'} />
-        <CustomProvider>
-          <Counter title={'custom'} />
-        </CustomProvider>
+      <div style={{ display: 'grid', gridAutoFlow: 'column', gridGap: '20px' }}>
+        <LogProvider>
+          <Counter title={'log'} />
+          <CounterProvider>
+            <Counter title={'log & counter'} />
+          </CounterProvider>
+        </LogProvider>
+        <CounterProvider>
+          <Counter title={'counter'} />
+        </CounterProvider>
       </div>
     </div>
   );
