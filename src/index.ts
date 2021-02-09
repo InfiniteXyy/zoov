@@ -1,7 +1,7 @@
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
 import { omit } from './utils';
 import { defineProvider } from './context';
-import type { ModuleFactory, RawModule, StateRecord } from './types';
+import { ModuleFactory, RawModule, StateRecord } from './types';
 
 const factory = (state: StateRecord, rawModule: RawModule, excluded: (keyof ModuleFactory)[] = []): ModuleFactory => {
   return {

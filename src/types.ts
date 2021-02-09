@@ -1,6 +1,6 @@
-import type { Observable } from 'rxjs';
-import type { Draft } from 'immer';
-import type { StateSelector, StateCreator, EqualityChecker, UseStore } from 'zustand';
+import { Observable } from 'rxjs';
+import { Draft } from 'immer';
+import { StateSelector, StateCreator, EqualityChecker, UseStore } from 'zustand';
 
 // basic types
 export type StateRecord = Record<string, any>;

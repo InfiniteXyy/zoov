@@ -18,7 +18,7 @@
 
 ## Quick Start
 
-You can try this [Example](https://codesandbox.io/s/zoov-example-vmv3p)
+You can try this [Example](https://stackblitz.com/edit/zoov-example)
 
 Or install locally
 

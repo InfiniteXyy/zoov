@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/zoov.js",
