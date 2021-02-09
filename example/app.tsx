@@ -1,14 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Counter } from './counter';
-import { TodoList } from './todo';
+import { BasicUsage } from './basic-usage';
+import { WithMiddleware } from './with-middleware';
+import { WithProvider } from './with-provider';
+import { WithRxJS } from './with-rxjs';
+import { WithSelector } from './with-selector';
 
 const App = () => {
   return (
-    <div>
-      <TodoList />
-      <Counter />
-    </div>
+    <>
+      <BasicUsage />
+      <WithMiddleware />
+      <WithProvider />
+      <WithRxJS />
+      <WithSelector />
+    </>
   );
 };
 

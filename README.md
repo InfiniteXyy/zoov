@@ -11,9 +11,10 @@
 ## Features
 
 - 😌 Comfortable type inference
-- ✨ No selector, state hooks are automatically generated
-- 🍳 100 line, Simple Wrapper on Zustand
-- 🧮 Modular state management
+- ✨ Immer, RxJS in the first class support
+- 🍳 150 line code based on Zustand
+- 🧮 Modular state management (Redux-like)
+- 📖 Scope supported with Algebraic Effects
 
 ## Quick Start
 
@@ -26,104 +27,120 @@ yarn add rxjs immer zustand # peer dependencies
 yarn add zoov
 ```
 
-## Examples
-
-#### Basic
+## First Glance
 
 ```tsx
-// 1. Defined a Module with a defaultState
-const Module = defineModule().model({ count: 0 });
+const CounterModule = defineModule({ count: 0 })
+  .actions({
+    add: (draft) => draft.count++,
+    minus: (draft) => draft.count--,
+  })
+  .computed({
+    doubled: (state) => state.count * 2,
+  })
+  .build();
 
-// 2. Call init function to get a module instance
-const module = Module.init();
-// 2.5. Different module instances won't affect each other
-const module2 = Module.init({ count: 1 });
-
-// 3. Use auto-generated state hooks in your component
 const App = () => {
-  // count: number
-  const count = module.useCount();
-  return <div>{count}</div>;
+  const [{ count }, { add }] = CounterModule.use();
+  return <button onClick={add}>{count}</button>;
+};
+
+// state is shared
+const App2 = () => {
+  const { doubled } = CounterModule.useComputed();
+  return <div>doubled: {doubled}</div>;
 };
 ```
 
-#### Extend Module
+## More Examples
+
+### Use Methods
 
 ```tsx
-const Module = defineModule()
-  .model({ count: 0 })
-  // 1. Actions are pure immer reducers update state
+const CounterModule = defineModule({ count: 0 })
   .actions({
-    increase: (draft, value) => draft.count += value,
-    decrease: (draft, value) => draft.count -= value,
-    reset: (draft) => draft.count = 0,
+    add: (draft) => draft.count++,
+    minus: (draft) => draft.count--,
   })
-  // 2. Methods are powerful functions, like async function, and you can trigger actions or getState here
-  .methods((self) => {
-    async increaseAfter1s() {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      self.getActions().increase(1)
-      console.log(self.getState())
-    }
+  .computed({
+    doubled: (state) => state.count * 2,
   })
-  // 3. Views are computed properties based on state
-  .views({
-    doubled: (state) => state.count * 2
+  .methods((perform, effect) => {
+    const { add, minus } = perform.getActions();
+    return {
+      addAndMinus: () => {
+        add();
+        add();
+        setTimeout(() => minus(), 100);
+      },
+      // async function is supported
+      asyncAdd: async () => {
+        await ...
+        add()
+      }
+      // you can also declare an effect, like redux-observable
+      addAfter: effect<number>((payload$) =>
+        payload$.pipe(
+          exhaustMap((timeout) => {
+            return timer(timeout).pipe(tap(() => add()));
+          })
+        )
+      ),
+    };
   })
+  .build();
 ```
 
-#### Use RxJS
+### Use Selector
 
 ```tsx
-const Module = defineModule()
-  .model({ count: 0 })
+const CounterModule = defineModule({ count: 0, input: 'hello' })
   .actions({
-    increase: (draft, value) => (draft.count += value),
-    decrease: (draft, value) => (draft.count -= value),
-    reset: (draft) => (draft.count = 0),
+    add: (draft) => draft.count++,
+    setInput: (draft, value: string) => (draft.input = value),
   })
-  // Sometimes, we need RxJS to help us handle complex event
-  // Here, the [effect] argument, is aimed to wrap an RxJS listener
-  .methods((self, effect) => ({
-    setTimer: effect<{ interval?: number }>((payload$) => {
-      return payload$.pipe(
-        switchMap(({ interval }) => {
-          self.getActions().reset();
-          if (!interval) return EMPTY;
-          return timer(0, interval).pipe(
-            tap(() => self.getActions().increase(1)),
-            tap(() => {
-              console.log(self.getState().count);
-            })
-          );
-        })
-      );
-    }),
-  }));
+  .build();
+
+const App = () => {
+  // <App /> will not rerender unless "count" changes
+  const [count] = CounterModule.use((state) => state.count);
+  return <span>{count}</span>;
+};
 ```
 
-#### Use Persist
+### Use Middleware
 
 ```tsx
-// see more in https://github.com/pmndrs/zustand/blob/master/src/middleware.ts#L125
-const module = Module.init({
-  persist: {
-    name: 'module',
-    whiteList: ['shouldPersist'],
-    version: 0,
-  },
+// see more examples in https://github.com/pmndrs/zustand/blob/master/src/middleware.ts
+const Module = defineModule({ count: 0 })
+  .actions({ add: (draft) => draft.count++ })
+  .middleware((store) => persist(store, { name: 'counter' }))
+  .build();
+```
+
+### Use Provider
+
+```tsx
+import { defineProvider } from 'zoov';
+const CustomProvider = defineProvider((handle) => {
+  // create a new Module scope for all its children(can be nested)
+  handle(YourModule, {
+    defaultState: {},
+  });
+  handle(AnotherModule, {
+    defaultState: {},
+  });
 });
+
+const App = () => {
+  // if a Module is not handled by any of its parent, then used global scope
+  return (
+    <div>
+      <CustomProvider>
+        <Component />
+      </CustomProvider>
+      <Component />
+    </div>
+  );
+};
 ```
-
-### TodoList
-
-- [x] better Readme
-- [x] support Effect
-- [x] support redux dev tools
-- [x] refactor with TS
-- [x] Unit Test
-- [x] Persist helper
-- [ ] support di?
-- [ ] computed values should only be triggered once
-- [ ] support svelte?
-- [ ] selector in hooks?
