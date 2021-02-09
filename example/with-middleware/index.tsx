@@ -1,11 +1,11 @@
 import React, { FC, memo } from 'react';
 import { defineModule } from '../../src';
-import type { MiddlewareBuilder } from '../../src/types';
+import type { StateCreator } from 'zustand';
 
 type State = { count: number };
 
 // forked from https://github.com/pmndrs/zustand
-const log: MiddlewareBuilder<State> = (config) => (set, get, api) =>
+const log = (config: StateCreator<State>): StateCreator<State> => (set, get, api) =>
   config(
     (args) => {
       set(args);
