@@ -15,10 +15,10 @@ const CounterModule = defineModule({ count: 0 })
     },
     reset: (draft) => (draft.count = 0),
   })
-  .methods(({ getActions }) => ({
+  .methods((perform) => ({
     addOne: () => {
-      getActions().add(1);
-      getActions(LogModule).log('perform addOne');
+      perform.getActions().add(1);
+      perform.getActions(LogModule).log('perform addOne');
     },
   }))
   .build();
