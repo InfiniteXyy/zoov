@@ -5,6 +5,7 @@ import { WithMiddleware } from './with-middleware';
 import { WithProvider } from './with-provider';
 import { WithRxJS } from './with-rxjs';
 import { WithSelector } from './with-selector';
+import { WithTransientScope } from './with-transient-scope';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
       <WithProvider />
       <WithRxJS />
       <WithSelector />
+      <WithTransientScope />
     </>
   );
 };

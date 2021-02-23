@@ -29,7 +29,7 @@ yarn add zoov
 
 ## First Glance
 
-```tsx
+```typescript jsx
 const CounterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
@@ -56,7 +56,7 @@ const App2 = () => {
 
 ### Use Methods
 
-```tsx
+```typescript jsx
 const CounterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
@@ -75,9 +75,9 @@ const CounterModule = defineModule({ count: 0 })
       },
       // async function is supported
       asyncAdd: async () => {
-        await ...
+        await something()
         add()
-      }
+      },
       // you can also declare an effect, like redux-observable
       addAfter: effect<number>((payload$) =>
         payload$.pipe(
@@ -93,7 +93,7 @@ const CounterModule = defineModule({ count: 0 })
 
 ### Use Selector
 
-```tsx
+```typescript jsx
 const CounterModule = defineModule({ count: 0, input: 'hello' })
   .actions({
     add: (draft) => draft.count++,
@@ -110,7 +110,7 @@ const App = () => {
 
 ### Use Middleware
 
-```tsx
+```typescript jsx
 // see more examples in https://github.com/pmndrs/zustand/blob/master/src/middleware.ts
 const Module = defineModule({ count: 0 })
   .actions({ add: (draft) => draft.count++ })
@@ -120,8 +120,9 @@ const Module = defineModule({ count: 0 })
 
 ### Use Provider
 
-```tsx
+```typescript jsx
 import { defineProvider } from 'zoov';
+
 const CustomProvider = defineProvider((handle) => {
   // create a new Module scope for all its children(can be nested)
   handle(YourModule, {
