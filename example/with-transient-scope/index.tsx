@@ -5,7 +5,6 @@ const CounterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
   })
-
   .build();
 
 const CounterTransientProvider: FC = ({ children }) => {

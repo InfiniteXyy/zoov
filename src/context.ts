@@ -1,16 +1,16 @@
 import React from 'react';
-import { ScopeContext, Module, Scope, ScopeBuildOption } from './types';
+import type { ScopeContext, HooksModule, Scope, ScopeBuildOption } from './types';
 
-type HandlerOption<M> = M extends Module<infer State> ? ScopeBuildOption<State> : never;
-type Handler = (handle: <M extends Module>(module: M, options: HandlerOption<M>) => void) => void;
+type HandlerOption<M> = M extends HooksModule<infer State> ? ScopeBuildOption<State> : never;
+type Handler = (handle: <M extends HooksModule<any>>(module: M, options: HandlerOption<M>) => void) => void;
 
 export const BuildScopeSymbol = Symbol('build-scope');
-const scopeContext = React.createContext<ScopeContext>(new Map<Module, Scope>());
+const scopeContext = React.createContext<ScopeContext>(new Map<HooksModule, Scope>());
 
 type ScopeBuilder = { [BuildScopeSymbol]: (options: ScopeBuildOption<any>) => Scope };
 
 export const defineProvider = (handler: Handler) => {
-  const providerScopeMap = new Map<Module, Scope>();
+  const providerScopeMap = new Map<HooksModule, Scope>();
   handler((module, options) => {
     providerScopeMap.set(module, ((module as unknown) as ScopeBuilder)[BuildScopeSymbol]({ ...options }));
   });
@@ -25,7 +25,7 @@ export const useScopeContext = () => {
   return React.useContext(scopeContext);
 };
 
-export const useScopeOr = <T extends Scope>(module: Module, globalScope: T): T => {
+export const useScopeOr = <T extends Scope<any, any, any>>(module: HooksModule<any, any, any>, globalScope: T): T => {
   const scopeMap = useScopeContext();
   return (scopeMap.get(module) as T) || globalScope;
 };

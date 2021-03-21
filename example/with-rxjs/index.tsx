@@ -1,5 +1,5 @@
 import React, { FC, memo, useCallback, useEffect } from 'react';
-import { defineModule } from '../../src';
+import { defineModule, effect } from '../../src';
 import { exhaustMap, tap } from 'rxjs/operators';
 import { timer } from 'rxjs';
 
@@ -7,7 +7,7 @@ const CounterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
   })
-  .methods((perform, effect) => ({
+  .methods((perform) => ({
     addAfter: effect<number>((payload$) =>
       payload$.pipe(
         exhaustMap((timeout) => {

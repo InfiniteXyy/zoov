@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
 import { Observable } from 'rxjs';
-import { defineModule } from '../src';
+import { defineModule, effect } from '../src';
 import { map, throttleTime } from 'rxjs/operators';
 import { MiddlewareBuilder } from '../src/types';
 
@@ -111,7 +111,7 @@ describe('test hooks', function () {
           getActions().add(getState().count * (times - 1));
         },
       }))
-      .methods(({ getActions, getState }, effect) => ({
+      .methods(({ getActions }) => ({
         lazyMultBy: async (times: number, timeout: number) => {
           await new Promise((resolve) => setTimeout(resolve, timeout));
           getActions().multBy(times);

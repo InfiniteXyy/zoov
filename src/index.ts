@@ -1,35 +1,26 @@
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
-import { omit } from './utils';
 import { defineProvider } from './context';
-import { ModuleFactory, RawModule, StateRecord } from './types';
+import type { ModuleFactory, RawModule, StateRecord } from './types';
 
-const factory = (state: StateRecord, rawModule: RawModule, excluded: (keyof ModuleFactory)[] = []): ModuleFactory => {
+function factory<State extends StateRecord>(state: State, rawModule: RawModule<any, any>): ModuleFactory<State, any, any> {
   return {
-    actions: (actions) => {
-      const _excluded: (keyof ModuleFactory)[] = [...excluded, 'actions'];
-      return omit(factory(state, extendActions(actions)(rawModule), _excluded), _excluded);
-    },
-    computed: (computed) => {
-      const _excluded: (keyof ModuleFactory)[] = [...excluded, 'computed'];
-      return omit(factory(state, extendComputed(computed)(rawModule), _excluded), _excluded);
-    },
-    methods: (methods) => {
-      return omit(factory(state, extendMethods(methods)(rawModule), excluded), excluded);
-    },
-    middleware: (middleware) => {
-      return omit(factory(state, extendMiddleware(middleware)(rawModule), excluded), excluded);
-    },
+    actions: (actions) => factory(state, extendActions(actions, rawModule)),
+    computed: (computed) => factory(state, extendComputed(computed, rawModule)),
+    methods: (methods) => factory(state, extendMethods(methods, rawModule)),
+    middleware: (middleware) => factory(state, extendMiddleware(middleware, rawModule)),
     build: buildModule(state, rawModule),
-  } as ModuleFactory;
-};
+  };
+}
 
-const defineModule = <State extends StateRecord>(defaultState: State): ModuleFactory<State> => {
+function defineModule<State extends StateRecord>(defaultState: State): ModuleFactory<State> {
   return factory(defaultState, {
     reducers: {},
     computed: {},
     methodsBuilders: [],
     middlewares: [],
-  }) as ModuleFactory<State>;
-};
+    excludedFields: [],
+  });
+}
 
 export { defineModule, defineProvider };
+export { effect } from './utils';
