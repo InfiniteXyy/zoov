@@ -48,17 +48,18 @@ export type HooksModule<State extends StateRecord = {}, Actions extends ActionsR
   useActions(): Actions;
   useComputed(): Computed;
   useState$(): Observable<State>;
-  globalScope: Scope<State, Actions>;
 };
 
 export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord = {}, Computed extends ComputedRecord = {}> = {
   store: UseStore<State>;
-  getActions(context?: ScopeContext): Actions;
+  getActions(context: ScopeContext): Actions;
   getComputed(): Computed;
   getState(): State;
   getState$(): Observable<State>;
 };
 
 export type ScopeBuildOption<State> = { defaultValue?: Partial<State>; middleware?: MiddlewareBuilder<State> };
+export type ScopeRef = { current?: Scope<any, any>; buildOption?: ScopeBuildOption<any> };
+export type ScopeContext = Map<HooksModule<any, any, any>, ScopeRef>;
 
-export type ScopeContext = Map<HooksModule<any, any, any>, Scope<any, any>>;
+export const buildScopeSymbol = Symbol('buildScope');
