@@ -1,5 +1,4 @@
 import { act, renderHook } from '@testing-library/react-hooks';
-import { Observable } from 'rxjs';
 import { defineModule, effect } from '../src';
 import { map, throttleTime } from 'rxjs/operators';
 import { MiddlewareBuilder } from '../src/types';
@@ -178,12 +177,4 @@ describe('test hooks', function () {
     expect(spy).toBeCalledTimes(2);
   });
 
-  it('should state$ be observable', async function () {
-    const Module = emptyModule.build();
-    const { result } = renderHook(() => {
-      const state$ = Module.useState$();
-      return { state$ };
-    });
-    expect(result.current.state$).toBeInstanceOf(Observable);
-  });
 });

@@ -11,7 +11,7 @@
 ## Features
 
 - 😌 Comfortable type inference
-- ✨ Immer, RxJS in the first class support
+- ✨ Immer in the first class support
 - 🍳 150 line code based on Zustand
 - 🧮 Modular state management (Redux-like)
 - 📖 Scope supported with Algebraic Effects
@@ -23,7 +23,7 @@ You can try this [Example](https://stackblitz.com/edit/zoov-example)
 Or install locally
 
 ```sh
-yarn add rxjs immer zustand # peer dependencies
+yarn add immer zustand # peer dependencies
 yarn add zoov
 ```
 
@@ -78,7 +78,7 @@ const CounterModule = defineModule({ count: 0 })
         await something()
         add()
       },
-      // you can also declare an effect, like redux-observable
+      // !rxjs is required if you want to use effect
       addAfter: effect<number>((payload$) =>
         payload$.pipe(
           exhaustMap((timeout) => {

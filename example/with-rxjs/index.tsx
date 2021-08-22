@@ -20,15 +20,9 @@ const CounterModule = defineModule({ count: 0 })
 
 export const WithRxJS: FC = memo(() => {
   const [{ count }, { addAfter }] = CounterModule.use();
-  const state$ = CounterModule.useState$();
 
   const addOne = useCallback(() => {
     addAfter(300);
-  }, []);
-
-  useEffect(() => {
-    const subscriber = state$.subscribe((i) => console.log({ count: i.count }));
-    return () => subscriber.unsubscribe();
   }, []);
 
   return (

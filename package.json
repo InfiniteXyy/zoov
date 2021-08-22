@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.1.5",
+  "version": "0.2.0-alpha.0",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/zoov.js",
@@ -38,38 +38,40 @@
   "peerDependencies": {
     "immer": ">=7.0.0",
     "react": ">=16.8.0",
-    "rxjs": ">=6.0.0",
     "zustand": ">=3.3.0"
   },
+  "optionalDependencies": {
+    "rxjs": ">=6.0.0"
+  },
   "devDependencies": {
-    "@testing-library/react": "^11.2.6",
-    "@testing-library/react-hooks": "^5.1.2",
-    "@types/jest": "^26.0.23",
-    "@types/node": "^15.0.2",
-    "@types/react": "^17.0.5",
-    "@types/react-dom": "^17.0.3",
-    "codecov": "^3.8.2",
-    "immer": "^9.0.2",
-    "jest": "^26.6.3",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/react-hooks": "^7.0.1",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.7.1",
+    "@types/react": "^17.0.19",
+    "@types/react-dom": "^17.0.9",
+    "codecov": "^3.8.3",
+    "immer": "^9.0.5",
+    "jest": "^27.0.6",
     "parcel": "^1.12.4",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "rimraf": "^3.0.2",
-    "rollup": "^2.47.0",
+    "rollup": "^2.56.2",
     "rollup-plugin-typescript2": "^0.30.0",
-    "rxjs": "^7.0.0",
+    "rxjs": "^7.3.0",
     "taze": "^0.4.5",
-    "ts-jest": "^26.5.6",
+    "ts-jest": "^27.0.5",
     "tsd": "^0.17.0",
-    "typescript": "^4.2.4",
-    "zustand": "^3.5.0"
+    "typescript": "^4.3.5",
+    "zustand": "^3.5.9"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "jsdom"
   },
   "tsd": {
-		"directory": "test"
-	}
+    "directory": "test"
+  }
 }

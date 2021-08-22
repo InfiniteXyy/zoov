@@ -1,5 +1,4 @@
 import type { StateSelector, StateCreator, EqualityChecker, UseStore } from 'zustand';
-import type { Observable } from 'rxjs';
 import type { Draft } from 'immer';
 
 /* Utility Types */
@@ -16,7 +15,6 @@ export type ComputedRecord = Record<string, (state: any) => any>;
 export type Perform<State extends StateRecord, Actions extends ActionsRecord> = {
   getActions<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<any, infer A> ? A : never;
   getState<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<infer S> ? S : never;
-  getState$<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<infer S> ? Observable<S> : never;
 };
 
 /* Core Types */
@@ -47,7 +45,6 @@ export type HooksModule<State extends StateRecord = {}, Actions extends ActionsR
   useState<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
   useActions(): Actions;
   useComputed(): Computed;
-  useState$(): Observable<State>;
 };
 
 export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord = {}, Computed extends ComputedRecord = {}> = {
@@ -55,7 +52,6 @@ export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord 
   getActions(context: ScopeContext): Actions;
   getComputed(): Computed;
   getState(): State;
-  getState$(): Observable<State>;
 };
 
 export type ScopeBuildOption<State> = { defaultValue?: Partial<State>; middleware?: MiddlewareBuilder<State> };
