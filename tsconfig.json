@@ -11,6 +11,6 @@
     "esModuleInterop": true,
     "jsx": "react"
   },
-  "include": ["src"],
+  "include": ["src", "/test/*.test-d.ts"],
   "exclude": ["node_modules"]
 }

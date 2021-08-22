@@ -29,7 +29,8 @@
     "prebuild": "rimraf ./dist",
     "prepare": "npm run build",
     "build": "rollup -c",
-    "test": "jest --coverage",
+    "test": "tsd && jest --coverage",
+    "test:types": "tsd",
     "dev": "rollup -c --watch",
     "example": "parcel ./example/index.html",
     "taze": "taze -w major"
@@ -60,11 +61,15 @@
     "rxjs": "^7.0.0",
     "taze": "^0.4.5",
     "ts-jest": "^26.5.6",
+    "tsd": "^0.17.0",
     "typescript": "^4.2.4",
     "zustand": "^3.5.0"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "jsdom"
-  }
+  },
+  "tsd": {
+		"directory": "test"
+	}
 }
