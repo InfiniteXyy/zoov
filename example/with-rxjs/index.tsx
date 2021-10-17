@@ -7,11 +7,11 @@ const CounterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
   })
-  .methods((perform) => ({
+  .methods(({ getActions }) => ({
     addAfter: effect<number>((payload$) =>
       payload$.pipe(
         exhaustMap((timeout) => {
-          return timer(timeout).pipe(tap(() => perform.getActions().add()));
+          return timer(timeout).pipe(tap(() => getActions().add()));
         })
       )
     ),

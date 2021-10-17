@@ -33,6 +33,7 @@
     "test:types": "tsd",
     "dev": "rollup -c --watch",
     "example": "parcel ./example/index.html",
+    "playground": "parcel ./playground/index.html",
     "taze": "taze -w major"
   },
   "peerDependencies": {

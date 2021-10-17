@@ -13,3 +13,4 @@ coverage
 
 # parcel
 .cache
+.parcel-cache
