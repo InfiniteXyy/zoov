@@ -24,3 +24,5 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
 
 export { defineModule, defineProvider };
 export { effect } from './utils';
+
+export const VERSION = '0.2.0';
