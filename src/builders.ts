@@ -2,7 +2,7 @@ import produce from 'immer';
 import create from 'zustand';
 import { redux } from 'zustand/middleware';
 import { useScopeContext } from './context';
-import { buildScopeSymbol } from './types';
+import { buildScopeSymbol, DefaultActions } from './types';
 
 import type { EqualityChecker, StateCreator, StateSelector } from 'zustand';
 import type { ActionsRecord, ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext, Scope } from './types';
@@ -43,7 +43,7 @@ const getScopeOrBuild = (context: ScopeContext, module: HooksModule<any, any>): 
 };
 
 export const buildModule =
-  <State extends StateRecord, Actions extends ActionsRecord>(state: State, rawModule: RawModule<State, Actions>) =>
+  <State extends StateRecord, Actions extends ActionsRecord>(state: State, rawModule: RawModule<State, Actions & DefaultActions<State>>) =>
   (): HooksModule<State, Actions> => {
     const buildScope = (props?: ScopeBuildOption<State>): Scope<State, Actions> => {
       // this function keeps all essential build-module data with closure
@@ -63,19 +63,41 @@ export const buildModule =
         getComputed: () => computed,
         getActions: (context: ScopeContext) => {
           const cachedAction = cachedActionsMap.get(context);
-          if (cachedAction) return cachedAction as Actions;
+          if (cachedAction) return cachedAction as Actions & DefaultActions<State>;
+
           // build actions
-          let actions = {} as Actions;
+          let actions = {} as Actions & DefaultActions<State>;
+
+          // the default setState function
+          actions.setState = (...args: any[]) => {
+            const newState = produce((draft) => {
+              const getters = args.slice(0, args.length - 1);
+              const setter = args[args.length - 1];
+              for (let i = 0; i < getters.length; i++) {
+                if (i === getters.length - 1) {
+                  if (typeof setter === 'function') {
+                    draft[getters[i]] = setter(draft[getters[i]]);
+                  } else {
+                    draft[getters[i]] = setter;
+                  }
+                } else {
+                  draft = draft[getters[i]];
+                }
+              }
+            })(self.store.getState());
+            self.store.setState(newState);
+          };
+
           // bind Actions with dispatch, build methods
           const dispatch = self.store.getState().dispatch as (payload: { type: keyof ActionsRecord; payload: any }) => void;
           Object.keys(rawModule.reducers).forEach((key: keyof Actions & string) => {
-            actions[key] = ((...args: any) => dispatch({ type: key, payload: args })) as Actions[typeof key];
+            (actions[key] as any) = ((...args: any) => dispatch({ type: key, payload: args })) as Actions[typeof key];
           });
           const getScope = (module?: HooksModule<any, any>): Scope<any, any> => {
             if (!module) return self;
             return getScopeOrBuild(context, module);
           };
-          const perform: Perform<State, Actions> = {
+          const perform: Perform<State, Actions & DefaultActions<State>> = {
             getState: (module?: HooksModule) => getScope(module).getState(),
             getActions: (module?: HooksModule) => getScope(module).getActions(context),
           };

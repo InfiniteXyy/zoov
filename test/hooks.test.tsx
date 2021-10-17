@@ -177,4 +177,27 @@ describe('test hooks', function () {
     expect(spy).toBeCalledTimes(2);
   });
 
+  it('should default setState works', () => {
+    const Module = defineModule({ deep: { name: 'xyy', age: 12 }, checked: false })
+      .actions({
+        hello: () => {},
+      })
+      .build();
+
+    const { result } = renderHook(() => {
+      const { setState, hello } = Module.useActions();
+      const state = Module.useState();
+      return { setState, state, hello };
+    });
+
+    act(() => void result.current.setState('checked', true));
+    expect(result.current.state.checked).toBe(true);
+
+    act(() => void result.current.setState('deep', 'age', (age) => age + 1));
+    expect(result.current.state.deep.age).toBe(13);
+
+    act(() => void result.current.setState('deep', 'age', (age) => age + 1));
+    expect(result.current.state.deep.age).toBe(14);
+
+  });
 });

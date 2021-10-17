@@ -3,9 +3,11 @@ import type { StateCreator, SetState } from 'zustand';
 import { expectType } from 'tsd';
 import { defineModule } from '../src';
 
+import { DefaultActions } from '../src/types';
+
 type ModuleState = { count: number };
 type ModuleComputed = { doubled: number };
-type ModuleActions = { add: (count?: number) => void };
+type ModuleActions = DefaultActions<ModuleState> & { add: (count?: number) => void };
 type ModuleMethods = { addAsync(count?: number): Promise<void> };
 
 const module = defineModule<ModuleState>({ count: 0 })

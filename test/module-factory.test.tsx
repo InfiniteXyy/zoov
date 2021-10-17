@@ -16,8 +16,8 @@ describe('test module factory', function () {
     act(() => {
       const { result: result2 } = renderHook(() => Module2.useActions());
       const { result: result3 } = renderHook(() => Module3.useActions());
-      expect(Object.keys(result2.current)).toHaveLength(0);
-      expect(Object.keys(result3.current)).toHaveLength(1);
+      expect(Object.keys(result2.current)).toHaveLength(1); // setState
+      expect(Object.keys(result3.current)).toHaveLength(2); // setState + hello
     });
   });
 });

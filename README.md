@@ -65,8 +65,8 @@ const CounterModule = defineModule({ count: 0 })
   .computed({
     doubled: (state) => state.count * 2,
   })
-  .methods((perform, effect) => {
-    const { add, minus } = perform.getActions();
+  .methods(({ getActions }) => {
+    const { add, minus } = getActions();
     return {
       addAndMinus: () => {
         add();
@@ -78,7 +78,7 @@ const CounterModule = defineModule({ count: 0 })
         await something()
         add()
       },
-      // !rxjs is required if you want to use effect
+      // !rxjs is required if you want to use effect, import from 'zoov/utils'
       addAfter: effect<number>((payload$) =>
         payload$.pipe(
           exhaustMap((timeout) => {
@@ -116,6 +116,18 @@ const Module = defineModule({ count: 0 })
   .actions({ add: (draft) => draft.count++ })
   .middleware((store) => persist(store, { name: 'counter' }))
   .build();
+```
+
+### Use default setState Action
+
+```typescript jsx
+// a lite copy of solidjs/store, with strict type check
+const Module = defineModule({ count: 0, nested: { checked: boolean } }).build();
+
+const [{ setState }] = Module.useActions()
+
+setState('count', 1)
+setState('nested', 'checked', v => !v)
 ```
 
 ### Use Provider
