@@ -18,7 +18,7 @@
 
 ## Quick Start
 
-You can try this [Example](https://stackblitz.com/edit/zoov-example)
+You can try it on [StackBlitz](https://stackblitz.com/edit/zoov-example) or [CodeSandbox](https://codesandbox.io/s/zoov-example-8ggez)
 
 Or install locally
 
@@ -121,7 +121,7 @@ const Module = defineModule({ count: 0 })
 ### Use default setState Action
 
 ```typescript jsx
-// a lite copy of solidjs/store, with strict type check
+// a lite copy of solid-js/store, with strict type check
 const Module = defineModule({ count: 0, nested: { checked: boolean } }).build();
 
 const [{ setState }] = Module.useActions()
