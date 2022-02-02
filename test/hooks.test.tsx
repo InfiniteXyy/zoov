@@ -1,5 +1,6 @@
 import { act, renderHook } from '@testing-library/react-hooks';
-import { defineModule, effect } from '../src';
+import { defineModule } from '../src';
+import { effect } from '../src/utils';
 import { map, throttleTime } from 'rxjs/operators';
 import { MiddlewareBuilder } from '../src/types';
 
@@ -198,6 +199,5 @@ describe('test hooks', function () {
 
     act(() => void result.current.setState('deep', 'age', (age) => age + 1));
     expect(result.current.state.deep.age).toBe(14);
-
   });
 });

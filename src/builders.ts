@@ -52,7 +52,7 @@ export const buildModule =
       const { defaultValue = {}, middleware } = props || {};
 
       const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
-      const stateCreator: StateCreator<State> = redux(scopeReducer, { ...state, ...defaultValue });
+      const stateCreator: StateCreator<State, any, any, any> = redux(scopeReducer, { ...state, ...defaultValue });
       const middlewares = middleware ? [middleware] : rawModule.middlewares;
 
       const computed: ComputedRecord = {};

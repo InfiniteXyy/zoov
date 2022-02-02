@@ -23,7 +23,7 @@ export type ComputedBuilder<State extends StateRecord> = Record<string, (state: 
 export type MethodBuilder<State extends StateRecord, Actions extends ActionsRecord & DefaultActions<State>> = (
   perform: Perform<State, Actions>
 ) => Record<any, (...args: any[]) => any>;
-export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State>) => StateCreator<State>;
+export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State>) => StateCreator<State, any, any, any>;
 
 export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord & DefaultActions<State> = DefaultActions<State>> = {
   computed: Record<string, (state: State) => any>;
@@ -69,21 +69,24 @@ export const buildScopeSymbol = Symbol('buildScope');
 
 /* Auto setState, copied from solid-js/store/types */
 /* Copyright (c) 2016-2019 Ryan Carniato */
+type NotWrappable = string | number | bigint | symbol | boolean | Function | null | undefined;
 type Part<T> = T extends any[] ? never : T extends object ? keyof T : never;
 type NullableNext<T, K> = K extends keyof T ? T[K] : never;
 type Next<T, K> = NonNullable<NullableNext<T, K>>;
-type StoreSetter<T> = T | ((prevState: T) => T);
+type WrappableNext<T, K extends Part<T>> = Exclude<Next<T, K>, NotWrappable>;
+
+export type StoreSetter<T> = T | ((prevState: T) => T);
 
 /* prettier-ignore */
 export interface SetState<T> {
-  <Setter extends StoreSetter<T>>(...args: [Setter]): void;
-  <K1 extends Part<T>, Setter extends StoreSetter<NullableNext<T, K1>>>(...args: [K1, Setter]): void;
-  <K1 extends Part<T>, K2 extends Part<Next<T, K1>>, Setter extends StoreSetter<NullableNext<Next<T, K1>, K2>>>(...args: [K1, K2, Setter]): void;
-  <K1 extends Part<T>, K2 extends Part<Next<T, K1>>, K3 extends Part<Next<Next<T, K1>, K2>>, Setter extends StoreSetter<NullableNext<Next<Next<T, K1>, K2>, K3>>>(...args: [K1, K2, K3, Setter]): void;
-  <K1 extends Part<T>, K2 extends Part<Next<T, K1>>, K3 extends Part<Next<Next<T, K1>, K2>>, K4 extends Part<Next<Next<Next<T, K1>, K2>, K3>>, Setter extends StoreSetter<NullableNext<Next<Next<Next<T, K1>, K2>, K3>, K4>>>(...args: [K1, K2, K3, K4, Setter]): void;
-  <K1 extends Part<T>, K2 extends Part<Next<T, K1>>, K3 extends Part<Next<Next<T, K1>, K2>>, K4 extends Part<Next<Next<Next<T, K1>, K2>, K3>>, K5 extends Part<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>>, Setter extends StoreSetter<NullableNext<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>>>(...args: [K1, K2, K3, K4, K5, Setter]): void;
-  <K1 extends Part<T>, K2 extends Part<Next<T, K1>>, K3 extends Part<Next<Next<T, K1>, K2>>, K4 extends Part<Next<Next<Next<T, K1>, K2>, K3>>, K5 extends Part<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>>, K6 extends Part<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>>, Setter extends StoreSetter<NullableNext<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>, K6>>>(...args: [K1, K2, K3, K4, K5, K6, Setter]): void;
-  <K1 extends Part<T>, K2 extends Part<Next<T, K1>>, K3 extends Part<Next<Next<T, K1>, K2>>, K4 extends Part<Next<Next<Next<T, K1>, K2>, K3>>, K5 extends Part<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>>, K6 extends Part<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>>, K7 extends Part<Next<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>, K6>>, Setter extends StoreSetter<NullableNext<Next<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>, K6>, K7>>>(...args: [K1, K2, K3, K4, K5, K6, K7, Setter]): void;
-  <K1 extends Part<T>, K2 extends Part<Next<T, K1>>, K3 extends Part<Next<Next<T, K1>, K2>>, K4 extends Part<Next<Next<Next<T, K1>, K2>, K3>>, K5 extends Part<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>>, K6 extends Part<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>>, K7 extends Part<Next<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>, K6>>, K8 extends Part<Next<Next<Next<Next<Next<Next<Next<T, K1>, K2>, K3>, K4>, K5>, K6>, K7>>>(...args: [K1, K2, K3, K4, K5, K6, K7, K8, ...(Part<any> | StoreSetter<any>)[]]): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, K6 extends Part<T5>, K7 extends Part<T6>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4>, T5 extends WrappableNext<T4, K5>, T6 extends WrappableNext<T5, K6> >( k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, k6: K6, k7: K7, setter: StoreSetter<Next<T6, K7>>): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, K6 extends Part<T5>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4>, T5 extends WrappableNext<T4, K5> >( k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, k6: K6, setter: StoreSetter<Next<T5, K6>> ): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4> >( k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, setter: StoreSetter<Next<T4, K5>> ): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3> >( k1: K1, k2: K2, k3: K3, k4: K4, setter: StoreSetter<Next<T3, K4>> ): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2> >( k1: K1, k2: K2, k3: K3, setter: StoreSetter<Next<T2, K3>> ): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, T1 extends WrappableNext<T, K1>>( k1: K1, k2: K2, setter: StoreSetter<Next<T1, K2>> ): void;
+  <K extends Part<T>>(k: K, setter: StoreSetter<Next<T, K>>): void;
+  (setter: StoreSetter<T>): void;
 }
+
 export type DefaultActions<State> = { setState: SetState<State> };
