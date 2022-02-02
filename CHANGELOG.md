@@ -1,3 +1,6 @@
+## 0.2.2
+- fix package json utils type
+
 ## 0.2.1
 - use unbuild for lib bundle, move `utils`(rxjs helper) to another entry
 - fix zustand type issues
