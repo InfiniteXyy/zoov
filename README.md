@@ -18,7 +18,7 @@
 
 ## Quick Start
 
-You can try it on [StackBlitz](https://stackblitz.com/edit/zoov-example) or [CodeSandbox](https://codesandbox.io/s/zoov-example-8ggez)
+You can try it on [StackBlitz](https://stackblitz.com/edit/vitejs-vite-mgdqal) or [CodeSandbox](https://codesandbox.io/s/zoov-example-8ggez)
 
 Or install locally
 
