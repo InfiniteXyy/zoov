@@ -14,6 +14,7 @@ specifiers:
   prettier: ^2.5.1
   react: ^17.0.2
   react-dom: ^17.0.2
+  react-tracked: ^1.7.6
   rxjs: '>=6.0.0'
   taze: ^0.4.6
   ts-jest: ^27.1.3
@@ -39,6 +40,7 @@ devDependencies:
   prettier: 2.5.1
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
+  react-tracked: 1.7.6_react-dom@17.0.2+react@17.0.2
   taze: 0.4.6
   ts-jest: 27.1.3_a7e53b5e5b59e71a0fd4d8cf128393d5
   tsd: 0.19.1
@@ -6706,6 +6708,10 @@ packages:
       sisteransi: 1.0.5
     dev: true
 
+  /proxy-compare/2.0.2:
+    resolution: {integrity: sha512-3qUXJBariEj3eO90M3Rgqq3+/P5Efl0t/dl9g/1uVzIQmO3M+ql4hvNH3mYdu8H+1zcKv07YvL55tsY74jmH1A==}
+    dev: true
+
   /psl/1.8.0:
     resolution: {integrity: sha512-RIdOzyoavK+hA18OGGWDqUTsCLhtA7IcZ/6NCs4fFJaHBDab+pDDmDIByWFRQJq2Cd7r1OoQxBGKOaztq+hjIQ==}
     dev: true
@@ -6805,6 +6811,25 @@ packages:
   /react-refresh/0.9.0:
     resolution: {integrity: sha512-Gvzk7OZpiqKSkxsQvO/mbTN1poglhmAV7gR/DdIrRrSMXraRQQlfikRJOr3Nb9GTMPC5kof948Zy6jJZIFtDvQ==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /react-tracked/1.7.6_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-yqfkqj4UZpsadBLIHnPLrc8a0SLgjKoSQrdyipfWeXvLnPl+/AV8MrqRVbNogUJsqHOo+ojlWy2PMxuZPVcPnQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '*'
+      react-native: '*'
+      scheduler: '>=0.19.0'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      proxy-compare: 2.0.2
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      use-context-selector: 1.3.9_react-dom@17.0.2+react@17.0.2
     dev: true
 
   /react/17.0.2:
@@ -7802,6 +7827,23 @@ packages:
     resolution: {integrity: sha512-hJfIzMPJmI9IlLkby8QrsCykQ+SXDeO2W5Q9QTW3QpqZVTx4a/K7p8/5q+/isD8vsbVaFgql/gvAoQCRQ2Cb5w==}
     dependencies:
       fast-url-parser: 1.1.3
+    dev: true
+
+  /use-context-selector/1.3.9_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-YgzRyeFjoJXwFn2qLVAuIbV6EQ8DOuzu3SS/eiCxyAyvBhcn02jYSz8c5v22QQU3LW6Ez/Iyo62kKvS7Kdqt3A==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '*'
+      react-native: '*'
+      scheduler: '>=0.19.0'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+    dependencies:
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
     dev: true
 
   /util-deprecate/1.0.2:
