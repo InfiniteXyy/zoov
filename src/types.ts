@@ -1,4 +1,4 @@
-import type { StateSelector, StateCreator, EqualityChecker, UseStore } from 'zustand';
+import type { StateSelector, StateCreator, EqualityChecker, StoreApi, UseBoundStore } from 'zustand';
 import type { Draft } from 'immer';
 
 /* Utility Types */
@@ -23,7 +23,7 @@ export type ComputedBuilder<State extends StateRecord> = Record<string, (state: 
 export type MethodBuilder<State extends StateRecord, Actions extends ActionsRecord & DefaultActions<State>> = (
   perform: Perform<State, Actions>
 ) => Record<any, (...args: any[]) => any>;
-export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State>) => StateCreator<State, any, any, any>;
+export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State, any, any, any>) => StateCreator<State, any, any, any>;
 
 export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord & DefaultActions<State> = DefaultActions<State>> = {
   computed: Record<string, (state: State) => any>;
@@ -55,7 +55,7 @@ export type HooksModule<State extends StateRecord = {}, Actions extends ActionsR
 };
 
 export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord = DefaultActions<State>, Computed extends ComputedRecord = {}> = {
-  store: UseStore<State>;
+  store: UseBoundStore<StoreApi<State>>;
   getActions(context: ScopeContext): Actions;
   getComputed(): Computed;
   getState(): State;

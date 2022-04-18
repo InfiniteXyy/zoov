@@ -1,15 +1,19 @@
 import React from 'react';
-import { act, render } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+import { act, cleanup, render } from '@testing-library/react';
 import { defineModule, defineProvider } from '../src';
 
 type State = { count: number };
 
 describe('test scope context', () => {
-  const logSpy = jest.fn();
+  const logSpy = vi.fn();
 
   beforeEach(() => {
     logSpy.mockReset();
   });
+
+  afterEach(cleanup);
 
   const LogModule = defineModule({ prefix: 'global' })
     .methods(({ getState }) => ({

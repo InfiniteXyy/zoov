@@ -1,9 +1,10 @@
 import { map } from 'rxjs/operators';
+import { describe, it, expect, vi } from 'vitest';
 import { effect } from '../src/utils';
 
 describe('test utils', function () {
   it('should rxjs effect work', function () {
-    const fn = jest.fn();
+    const fn = vi.fn();
     const dispatch = effect<{ payload: string }>((payload$) => {
       return payload$.pipe(map(({ payload }) => fn(payload)));
     });

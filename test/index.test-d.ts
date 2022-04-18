@@ -32,7 +32,7 @@ const module = defineModule<ModuleState>({ count: 0 })
     },
   }))
   .middleware((store) => {
-    expectType<StateCreator<ModuleState, SetState<ModuleState>>>(store);
+    expectType<StateCreator<ModuleState, any, any, any>>(store);
     return store;
   })
   .build();

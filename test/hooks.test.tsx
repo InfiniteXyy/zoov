@@ -1,4 +1,5 @@
-import { act, renderHook } from '@testing-library/react-hooks';
+import { act, renderHook, cleanup } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { defineModule } from '../src';
 import { effect } from '../src/utils';
 import { map, throttleTime } from 'rxjs/operators';
@@ -7,6 +8,7 @@ import { MiddlewareBuilder } from '../src/types';
 type State = { count: number; input: string };
 
 describe('test hooks', function () {
+  afterEach(cleanup);
   const emptyModule = defineModule<State>({ count: 0, input: '' });
 
   it('should simple action works', function () {
@@ -42,7 +44,7 @@ describe('test hooks', function () {
         setInput: (draft, input: string) => (draft.input = input),
       })
       .build();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const { result } = renderHook(() => {
       const [input, { add }] = Module.use((state) => state.input);
       spy(input);
@@ -53,7 +55,7 @@ describe('test hooks', function () {
   });
 
   it('should computed works', function () {
-    const spy = jest.fn();
+    const spy = vi.fn();
     const Module = emptyModule
       .actions({
         add: (draft, value: number) => (draft.count += value),
@@ -146,16 +148,17 @@ describe('test hooks', function () {
   });
 
   it('should middleware works', function () {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
-    const middleware: MiddlewareBuilder<State> = (config) => (set, get, api) =>
+    const middleware: MiddlewareBuilder<State> = (config) => (set, get, api, mutation) =>
       config(
         (args) => {
           spy(args);
           set(args);
         },
         get,
-        api
+        api,
+        mutation
       );
 
     const Module = emptyModule

@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { BasicUsage } from './basic-usage';
 import { WithMiddleware } from './with-middleware';
 import { WithProvider } from './with-provider';
@@ -22,4 +22,4 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('root'));
+createRoot(document.getElementById('root')!).render(<App />)

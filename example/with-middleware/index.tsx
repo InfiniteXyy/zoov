@@ -5,15 +5,18 @@ import type { StateCreator } from 'zustand';
 type State = { count: number };
 
 // forked from https://github.com/pmndrs/zustand
-const log = (config: StateCreator<State>): StateCreator<State> => (set, get, api) =>
-  config(
-    (args) => {
-      set(args);
-      console.log('> set state', get());
-    },
-    get,
-    api
-  );
+const log =
+  (config: StateCreator<State>): StateCreator<State> =>
+  (set, get, api, mutation) =>
+    config(
+      (args) => {
+        set(args);
+        console.log('> set state', get());
+      },
+      get,
+      api,
+      mutation
+    );
 
 const CounterModule = defineModule<State>({ count: 0 })
   .actions({
