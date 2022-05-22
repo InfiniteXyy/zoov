@@ -54,18 +54,6 @@ const App2 = () => {
 ```
 
 ## More Examples
-
-### Use Computed
-
-```typescript
-const CounterModule = defineModule({ count: 0 }).computed({
-  // the computed value will be updated once the state changes
-  doubled: (state) => state.count * 2,
-  // You can also return a currying function
-  prefixBy: (state) => (prefix) => `${prefix}${state.count}`,
-});
-```
-
 ### Use Methods
 
 ```typescript jsx
