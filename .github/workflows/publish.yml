@@ -1,11 +1,13 @@
-name: Test
+name: Public to NPM
 
-on: [push, pull_request]
+on:
+  push:
+    tags:
+      - v*
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -14,10 +16,9 @@ jobs:
           version: 7.0.0
           run_install: true
 
-      - name: test
-        run: pnpm test
-
-      - name: report
-        uses: codecov/codecov-action@v1.1.1
+      - name: publish
+        run: npm run publish
         env:
-          CI: true
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+
