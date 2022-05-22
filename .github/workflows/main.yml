@@ -2,14 +2,15 @@ name: Test
 
 on:
   push:
-    tags-ignore:
-      - '*.*'
+    branches:
+      - main
+
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
