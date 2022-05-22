@@ -1,3 +1,10 @@
+## 0.3.0
+- refactor: `effect` function is now moved to `zoov/effect`
+- chore: use `zustand` v4
+- chore: update cjs,mjs export map, it may fix some bundler related issues.
+- fix: `computed` value will now only be triggered once through all the components
+- feat: module now have `getActions` `getState` export
+
 ## 0.2.2
 - fix package json utils type
 

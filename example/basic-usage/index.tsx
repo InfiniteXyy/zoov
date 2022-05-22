@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 import { defineModule } from '../../src';
 
-const CounterModule = defineModule({ count: 0 })
+const { use: useCounter, useComputed: useCounterComputed } = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
     minus: (draft) => draft.count--,
@@ -12,8 +12,8 @@ const CounterModule = defineModule({ count: 0 })
   .build();
 
 export const BasicUsage: FC = memo(() => {
-  const [{ count }, { add, minus }] = CounterModule.use();
-  const { doubled } = CounterModule.useComputed();
+  const [{ count }, { add, minus }] = useCounter();
+  const { doubled } = useCounterComputed();
 
   return (
     <div>

@@ -6,8 +6,6 @@
     "moduleResolution": "Node",
     "strict": true,
     "lib": ["ESNext", "DOM"],
-    "declarationDir": "dist/types",
-    "declaration": true,
     "esModuleInterop": true,
     "jsx": "react"
   },

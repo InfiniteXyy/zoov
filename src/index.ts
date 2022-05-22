@@ -1,5 +1,5 @@
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
-import { defineProvider } from './context';
+import { defineProvider, useScopeContext } from './context';
 import type { ModuleFactory, RawModule, StateRecord } from './types';
 
 function factory<State extends StateRecord>(state: State, rawModule: RawModule<any, any>): ModuleFactory<State, any, any> {
@@ -22,6 +22,6 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
   });
 }
 
-export { defineModule, defineProvider };
+export { defineModule, defineProvider, useScopeContext };
 
-export const VERSION = '0.2.2';
+export const VERSION = '0.3.0';

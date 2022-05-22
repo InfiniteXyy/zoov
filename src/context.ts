@@ -4,7 +4,7 @@ import type { ScopeContext, HooksModule, ScopeBuildOption, ScopeRef } from './ty
 type HandlerOption<M> = M extends HooksModule<infer State> ? ScopeBuildOption<State> : never;
 type Handler = (handle: <M extends HooksModule<any>>(module: M, options: HandlerOption<M>) => void) => void;
 
-const globalScope = new Map<HooksModule, ScopeRef>();
+export const globalScope = new Map<HooksModule, ScopeRef>();
 
 const scopeContext = createContext<ScopeContext>(globalScope);
 
@@ -20,6 +20,8 @@ export const defineProvider = (handler: Handler) => {
   };
 };
 
+/** Get the module scope context
+ *  You can use it in the getState/getActions functions to get the `module state/actions` under a context */
 export const useScopeContext = () => {
   return useContext(scopeContext);
 };

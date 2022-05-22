@@ -1,5 +1,5 @@
 import type { Draft } from 'immer';
-import type { StateCreator, SetState } from 'zustand';
+import type { StateCreator } from 'zustand';
 import { expectType } from 'tsd';
 import { defineModule } from '../src';
 

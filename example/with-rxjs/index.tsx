@@ -1,6 +1,6 @@
 import React, { FC, memo, useCallback, useEffect } from 'react';
 import { defineModule } from '../../src';
-import { effect } from '../../src/utils';
+import { effect } from '../../src/effect';
 import { exhaustMap, tap } from 'rxjs/operators';
 import { timer } from 'rxjs';
 

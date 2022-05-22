@@ -52,6 +52,18 @@ export type HooksModule<State extends StateRecord = {}, Actions extends ActionsR
   useState<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
   useActions(): Actions;
   useComputed(): Computed;
+  /** Retrieve state outside React components,
+   *  note: By default, the return value will be the global module state. 
+   *        If you want to get "scope-inner" state, you must use the scope parameter. 
+   *        you can get the scope via hooks `useScopeContext()`
+   */
+  getState(scope?: ScopeContext): State;
+  /** Retrieve actions outside React components,
+   *  note: By default, the return value will be the global module state.
+   *        If you want to get "scope-inner" actions, you must use the scope parameter.
+   *        you can get the scope via hooks `useScopeContext()`
+   */
+  getActions(scope?: ScopeContext): Actions;
 };
 
 export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord = DefaultActions<State>, Computed extends ComputedRecord = {}> = {

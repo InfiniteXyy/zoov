@@ -1,7 +1,7 @@
 import { act, renderHook, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { defineModule } from '../src';
-import { effect } from '../src/utils';
+import { effect } from '../src/effect';
 import { map, throttleTime } from 'rxjs/operators';
 import { MiddlewareBuilder } from '../src/types';
 
@@ -100,6 +100,35 @@ describe('test hooks', function () {
     });
     act(() => void result.current.add(2));
     expect(result.current.doubled).toBe(4);
+  });
+
+  it('should pure computed only be triggered once', function () {
+    const spy = vi.fn();
+    const Module = emptyModule
+      .actions({
+        add: (draft, value: number) => (draft.count += value),
+      })
+      .computed({
+        doubled: (state) => {
+          spy();
+          return state.count * 2;
+        },
+      })
+      .build();
+
+    const { result } = renderHook(() => {
+      const { doubled } = Module.useComputed();
+      const { add } = Module.useActions();
+      return { doubled, add };
+    });
+
+    renderHook(() => {
+      const { doubled } = Module.useComputed();
+      return { doubled };
+    });
+    expect(spy).toBeCalledTimes(1);
+    act(() => void result.current.add(2));
+    expect(spy).toBeCalledTimes(2);
   });
 
   it('should methods work', async function () {

@@ -10,11 +10,12 @@
 
 ## Features
 
-- 😌 Comfortable type inference
-- ✨ Immer in the first class support
-- 🍳 150 line code based on Zustand
-- 🧮 Modular state management (Redux-like)
-- 📖 Scope supported with Algebraic Effects
+- 😌 Easy: Comfortable type inference
+- ✨ Magic: Update state by just mutate it (with support of immer)
+- 🍳 Tiny: 160 line code based on Zustand
+- 🧮 Powerful: Modular state management (Redux-like)
+- 📖 Smart: Scope supported with Algebraic Effects
+- 📦 Flexible: Attach state/actions inside or outside React
 
 ## Quick Start
 
@@ -30,7 +31,7 @@ yarn add zoov
 ## First Glance
 
 ```typescript jsx
-const CounterModule = defineModule({ count: 0 })
+const { use: useCounter, useComputed: useCounterComputed } = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
     minus: (draft) => draft.count--,
@@ -41,29 +42,39 @@ const CounterModule = defineModule({ count: 0 })
   .build();
 
 const App = () => {
-  const [{ count }, { add }] = CounterModule.use();
+  const [{ count }, { add }] = useCounter();
   return <button onClick={add}>{count}</button>;
 };
 
 // state is shared
 const App2 = () => {
-  const { doubled } = CounterModule.useComputed();
+  const { doubled } = useCounterComputed();
   return <div>doubled: {doubled}</div>;
 };
 ```
 
 ## More Examples
 
+### Use Computed
+
+```typescript
+const CounterModule = defineModule({ count: 0 }).computed({
+  // the computed value will be updated once the state changes
+  doubled: (state) => state.count * 2,
+  // You can also return a currying function
+  prefixBy: (state) => (prefix) => `${prefix}${state.count}`,
+});
+```
+
 ### Use Methods
 
 ```typescript jsx
+import { effect } from 'zoov/effect';
+
 const CounterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
     minus: (draft) => draft.count--,
-  })
-  .computed({
-    doubled: (state) => state.count * 2,
   })
   .methods(({ getActions }) => {
     const { add, minus } = getActions();
@@ -75,10 +86,10 @@ const CounterModule = defineModule({ count: 0 })
       },
       // async function is supported
       asyncAdd: async () => {
-        await something()
-        add()
+        await something();
+        add();
       },
-      // !rxjs is required if you want to use effect, import from 'zoov/utils'
+      // [TIPS] If you want to `rxjs` in `zoov`, your should first install `rxjs`
       addAfter: effect<number>((payload$) =>
         payload$.pipe(
           exhaustMap((timeout) => {
@@ -94,7 +105,7 @@ const CounterModule = defineModule({ count: 0 })
 ### Use Selector
 
 ```typescript jsx
-const CounterModule = defineModule({ count: 0, input: 'hello' })
+const { use: useCounter } = defineModule({ count: 0, input: 'hello' })
   .actions({
     add: (draft) => draft.count++,
     setInput: (draft, value: string) => (draft.input = value),
@@ -103,7 +114,7 @@ const CounterModule = defineModule({ count: 0, input: 'hello' })
 
 const App = () => {
   // <App /> will not rerender unless "count" changes
-  const [count] = CounterModule.use((state) => state.count);
+  const [count] = useCounter((state) => state.count);
   return <span>{count}</span>;
 };
 ```
@@ -122,12 +133,12 @@ const Module = defineModule({ count: 0 })
 
 ```typescript jsx
 // a lite copy of solid-js/store, with strict type check
-const Module = defineModule({ count: 0, nested: { checked: boolean } }).build();
+const { useActions } = defineModule({ count: 0, nested: { checked: boolean } }).build();
 
-const [{ setState }] = Module.useActions()
+const [{ setState }] = useActions();
 
-setState('count', 1)
-setState('nested', 'checked', v => !v)
+setState('count', 1);
+setState('nested', 'checked', (v) => !v);
 ```
 
 ### Use Provider
@@ -156,4 +167,16 @@ const App = () => {
     </div>
   );
 };
+```
+
+### Attach state outside components
+
+```typescript jsx
+// by default, it will get the state under global scope
+const actions = module.getActions();
+const state = module.getActions();
+
+// you can specify the scope with params
+const scope = useScopeContext();
+const scopeActions = module.getActions(scope);
 ```

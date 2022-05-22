@@ -1,6 +1,6 @@
 import { map } from 'rxjs/operators';
 import { describe, it, expect, vi } from 'vitest';
-import { effect } from '../src/utils';
+import { effect } from '../src/effect';
 
 describe('test utils', function () {
   it('should rxjs effect work', function () {

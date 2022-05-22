@@ -1,12 +1,13 @@
 import produce from 'immer';
 import create from 'zustand';
 import { redux } from 'zustand/middleware';
-import { useScopeContext } from './context';
+import { globalScope, useScopeContext } from './context';
 import { buildScopeSymbol, DefaultActions } from './types';
 
 import type { EqualityChecker, StateCreator, StateSelector } from 'zustand';
 import type { ActionsRecord, ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext, Scope } from './types';
 import type { Perform, ScopeBuildOption, MethodBuilder, MiddlewareBuilder } from './types';
+import { simpleMemoizedFn } from './utils';
 
 type ScopeReducer<State extends StateRecord> = (state: State, action: { type: string; payload: any }) => State;
 
@@ -35,9 +36,9 @@ export const extendMiddleware = (middleware: MiddlewareBuilder<any>, rawModule: 
   excludedFields: [...rawModule.excludedFields, 'middleware'],
 });
 
-const getScopeOrBuild = (context: ScopeContext, module: HooksModule<any, any>): Scope<any, any> => {
-  if (!context.has(module)) context.set(module, {});
-  const scopeRef = context.get(module)!;
+const getScopeOrBuild = (scope: ScopeContext, module: HooksModule<any, any>): Scope<any, any> => {
+  if (!scope.has(module)) scope.set(module, {});
+  const scopeRef = scope.get(module)!;
   if (!scopeRef.current) scopeRef.current = (module as any)[buildScopeSymbol](scopeRef.buildOption);
   return scopeRef.current!;
 };
@@ -109,8 +110,10 @@ export const buildModule =
         },
         getState: () => self.store.getState(),
       };
+
       // bind Computed
       Object.keys(rawModule.computed).forEach((key) => {
+        rawModule.computed[key] = simpleMemoizedFn(rawModule.computed[key]);
         Object.defineProperty(computed, key, {
           get: () => self.store(rawModule.computed[key]),
         });
@@ -129,6 +132,8 @@ export const buildModule =
       useActions: () => useScope().getActions(useScopeContext()),
       useComputed: () => useScope().getComputed(),
       use: (...args: any) => [module.useState(...args), module.useActions()],
+      getState: (scope = globalScope) => getScopeOrBuild(scope, module).getState(),
+      getActions: (scope = globalScope) => getScopeOrBuild(scope, module).getActions(scope),
       [buildScopeSymbol]: buildScope,
     } as HooksModule<State, Actions>;
 
