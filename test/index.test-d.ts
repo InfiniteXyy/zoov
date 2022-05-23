@@ -1,13 +1,13 @@
 import type { Draft } from 'immer';
 import type { StateCreator } from 'zustand';
-import { expectType } from 'tsd';
+import { expectType, expectNotType } from 'tsd';
 import { defineModule } from '../src';
 
-import { DefaultActions } from '../src/types';
+import { ActionsRecord, __buildScopeSymbol } from '../src/types';
 
 type ModuleState = { count: number };
 type ModuleComputed = { doubled: number };
-type ModuleActions = DefaultActions<ModuleState> & { add: (count?: number) => void };
+type ModuleActions = ActionsRecord<ModuleState> & { add: (count?: number) => void };
 type ModuleMethods = { addAsync(count?: number): Promise<void> };
 
 const module = defineModule<ModuleState>({ count: 0 })

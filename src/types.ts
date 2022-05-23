@@ -5,38 +5,37 @@ import type { Draft } from 'immer';
 type OmitDraftArg<F> = F extends (draft: Draft<any>, ...args: infer A) => void ? (...args: A) => void : never;
 
 type GenAction<RawAction> = RawAction extends Record<string, any> ? { [K in keyof RawAction]: OmitDraftArg<RawAction[K]> } : never;
-type GenComputed<RawComputed> = RawComputed extends Record<string, (...args: any[]) => any> ? { [K in keyof RawComputed]: ReturnType<RawComputed[K]> } : never;
+type GenComputed<RawComputed> = RawComputed extends Record<string, (...args: any) => unknown> ? { [K in keyof RawComputed]: ReturnType<RawComputed[K]> } : never;
 
 /* Basic Types */
 export type StateRecord = Record<string, any>;
-export type ActionsRecord = Record<string, (...args: any) => void>;
+export type Reducer<State> = (...args: any) => (state: State) => State;
+export type Action = (...args: any) => void;
+export type ActionsRecord<State> = Record<string, Action> & { setState: SetState<State> };
 export type ComputedRecord = Record<string, (state: any) => any>;
 
-export type Perform<State extends StateRecord, Actions extends ActionsRecord & DefaultActions<State>> = {
+export type Perform<State extends StateRecord, Actions extends ActionsRecord<State>> = {
   getActions<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<any, infer A> ? A : never;
   getState<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<infer S> ? S : never;
 };
 
 /* Core Types */
-export type ActionBuilder<State extends StateRecord> = Record<string, (draft: Draft<State>, ...args: any[]) => void>;
+export type ActionBuilder<State extends StateRecord> = Record<string, (draft: Draft<State>, ...args: any) => void>;
 export type ComputedBuilder<State extends StateRecord> = Record<string, (state: State) => any>;
-export type MethodBuilder<State extends StateRecord, Actions extends ActionsRecord & DefaultActions<State>> = (
-  perform: Perform<State, Actions>
-) => Record<any, (...args: any[]) => any>;
+export type MethodBuilder<State extends StateRecord, Actions extends ActionsRecord<State>> = (perform: Perform<State, Actions>) => Record<any, (...args: any) => any>;
 export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State, any, any, any>) => StateCreator<State, any, any, any>;
 
-export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord & DefaultActions<State> = DefaultActions<State>> = {
+export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>> = {
   computed: Record<string, (state: State) => any>;
   // "reducers" and "methodsBuilders" will be turned into actions
-  reducers: Record<string, (...args: any) => (state: State) => State>;
+  reducers: Record<string, Reducer<State>>;
   methodsBuilders: MethodBuilder<State, Actions>[];
   middlewares: MiddlewareBuilder<State>[];
-  excludedFields: (keyof ModuleFactory)[];
 };
 
 export type ModuleFactory<
   State extends StateRecord = {},
-  Actions extends ActionsRecord & DefaultActions<State> = DefaultActions<State>,
+  Actions extends ActionsRecord<State> = ActionsRecord<State>,
   Computed extends ComputedRecord = {},
   Excluded extends string = never
 > = {
@@ -44,29 +43,12 @@ export type ModuleFactory<
   computed<C extends ComputedBuilder<State>>(computed: C): Omit<ModuleFactory<State, Actions, GenComputed<C>, Excluded | 'computed'>, Excluded | 'computed'>;
   methods<MB extends MethodBuilder<State, Actions>>(builder: MB): ModuleFactory<State, ReturnType<MB> & Actions, Computed, Excluded>;
   middleware<M extends MiddlewareBuilder<State>>(middleware: M): Omit<ModuleFactory<State, Actions, Computed, Excluded | 'middleware'>, Excluded | 'middleware'>;
-  build(): HooksModule<State, Actions, Computed>;
+  build(): Omit<HooksModule<State, Actions, Computed>, typeof __buildScopeSymbol>;
 };
 
-export type HooksModule<State extends StateRecord = {}, Actions extends ActionsRecord = DefaultActions<State>, Computed extends ComputedRecord = {}> = {
-  use<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): [SelectorResult, Actions];
-  useState<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
-  useActions(): Actions;
-  useComputed(): Computed;
-  /** Retrieve state outside React components,
-   *  note: By default, the return value will be the global module state. 
-   *        If you want to get "scope-inner" state, you must use the scope parameter. 
-   *        you can get the scope via hooks `useScopeContext()`
-   */
-  getState(scope?: ScopeContext): State;
-  /** Retrieve actions outside React components,
-   *  note: By default, the return value will be the global module state.
-   *        If you want to get "scope-inner" actions, you must use the scope parameter.
-   *        you can get the scope via hooks `useScopeContext()`
-   */
-  getActions(scope?: ScopeContext): Actions;
-};
+export const __buildScopeSymbol = Symbol('buildScope');
 
-export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord = DefaultActions<State>, Computed extends ComputedRecord = {}> = {
+export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>, Computed extends ComputedRecord = {}> = {
   store: UseBoundStore<StoreApi<State>>;
   getActions(context: ScopeContext): Actions;
   getComputed(): Computed;
@@ -77,7 +59,24 @@ export type ScopeBuildOption<State> = { defaultValue?: Partial<State>; middlewar
 export type ScopeRef = { current?: Scope<any, any>; buildOption?: ScopeBuildOption<any> };
 export type ScopeContext = Map<HooksModule<any, any, any>, ScopeRef>;
 
-export const buildScopeSymbol = Symbol('buildScope');
+export type HooksModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>, Computed extends ComputedRecord = {}> = {
+  use<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): [SelectorResult, Actions];
+  useState<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
+  useActions(): Actions;
+  useComputed(): Computed;
+  /** Retrieve state outside React components,
+   *  note: By default, the return value will be the global module state.
+   *        If you want to get "scope-inner" state, you must use the scope parameter.
+   *        you can get the scope via hooks `useScopeContext()`
+   */
+  getState(scope?: ScopeContext): State;
+  /** Retrieve actions outside React components,
+   *  note: By default, the return value will be the global module state.
+   *        If you want to get "scope-inner" actions, you must use the scope parameter.
+   *        you can get the scope via hooks `useScopeContext()`
+   */
+  getActions(scope?: ScopeContext): Actions;
+};
 
 /* Auto setState, copied from solid-js/store/types */
 /* Copyright (c) 2016-2019 Ryan Carniato */
@@ -100,5 +99,3 @@ export interface SetState<T> {
   <K extends Part<T>>(k: K, setter: StoreSetter<Next<T, K>>): void;
   (setter: StoreSetter<T>): void;
 }
-
-export type DefaultActions<State> = { setState: SetState<State> };

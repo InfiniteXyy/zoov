@@ -1,3 +1,6 @@
+## 0.3.1
+- chore: refactor type definitions
+
 ## 0.3.0
 - refactor: `effect` function is now moved to `zoov/effect`
 - chore: use `zustand` v4

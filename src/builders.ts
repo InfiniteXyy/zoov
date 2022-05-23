@@ -2,72 +2,69 @@ import produce from 'immer';
 import create from 'zustand';
 import { redux } from 'zustand/middleware';
 import { globalScope, useScopeContext } from './context';
-import { buildScopeSymbol, DefaultActions } from './types';
-
-import type { EqualityChecker, StateCreator, StateSelector } from 'zustand';
-import type { ActionsRecord, ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext, Scope } from './types';
-import type { Perform, ScopeBuildOption, MethodBuilder, MiddlewareBuilder } from './types';
+import { __buildScopeSymbol } from './types';
 import { simpleMemoizedFn } from './utils';
 
-type ScopeReducer<State extends StateRecord> = (state: State, action: { type: string; payload: any }) => State;
+import type { EqualityChecker, StateCreator, StateSelector } from 'zustand';
+import type { ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext, Scope, Reducer } from './types';
+import type { Perform, ScopeBuildOption, MethodBuilder, MiddlewareBuilder, Action, ActionsRecord } from './types';
 
-export const extendActions = (actions: ActionsRecord, rawModule: RawModule<any, any>): RawModule<any, any> => {
-  const reducers: any = {};
-  Object.keys(actions).forEach((key) => {
-    reducers[key] = (...args: any[]) => produce((draft) => void actions[key](draft, ...args));
-  });
-  return { ...rawModule, reducers, excludedFields: [...rawModule.excludedFields, 'actions'] };
-};
+export function extendActions<State, Actions extends ActionsRecord<State>>(rawActions: Actions, rawModule: RawModule<State, Actions>): RawModule<State, Actions> {
+  const reducerKeys: (keyof Actions)[] = Object.keys(rawActions);
+  const reducers = reducerKeys.reduce((acc, key) => {
+    acc[key] = (...args: unknown[]) => produce((draft) => void rawActions[key](draft, ...args));
+    return acc;
+  }, {} as Record<keyof Actions, Reducer<State>>);
+  return { ...rawModule, reducers };
+}
 
-export const extendComputed = (computed: ComputedRecord, rawModule: RawModule): RawModule => ({
-  ...rawModule,
-  computed,
-  excludedFields: [...rawModule.excludedFields, 'computed'],
-});
+export function extendComputed(computed: ComputedRecord, rawModule: RawModule): RawModule {
+  return { ...rawModule, computed };
+}
 
-export const extendMethods = (builder: MethodBuilder<any, any>, rawModule: RawModule): RawModule => ({
-  ...rawModule,
-  methodsBuilders: [...rawModule.methodsBuilders, builder],
-});
+export function extendMethods<State, Actions extends ActionsRecord<State>>(builder: MethodBuilder<State, Actions>, rawModule: RawModule): RawModule {
+  return { ...rawModule, methodsBuilders: [...rawModule.methodsBuilders, builder] };
+}
 
-export const extendMiddleware = (middleware: MiddlewareBuilder<any>, rawModule: RawModule): RawModule => ({
-  ...rawModule,
-  middlewares: [...rawModule.middlewares, middleware],
-  excludedFields: [...rawModule.excludedFields, 'middleware'],
-});
+export function extendMiddleware<State>(middleware: MiddlewareBuilder<State>, rawModule: RawModule<State>): RawModule<State> {
+  return { ...rawModule, middlewares: [...rawModule.middlewares, middleware] };
+}
 
-const getScopeOrBuild = (scope: ScopeContext, module: HooksModule<any, any>): Scope<any, any> => {
-  if (!scope.has(module)) scope.set(module, {});
-  const scopeRef = scope.get(module)!;
-  if (!scopeRef.current) scopeRef.current = (module as any)[buildScopeSymbol](scopeRef.buildOption);
-  return scopeRef.current!;
-};
+function getScopeOrBuild<State, Actions extends ActionsRecord<State>>(context: ScopeContext, module: HooksModule<State, Actions>): Scope<State, Actions> {
+  let scopeRef = context.get(module);
+  if (!scopeRef) {
+    scopeRef = {};
+    context.set(module, scopeRef);
+  }
+  return (scopeRef.current ??= (module as any)[__buildScopeSymbol](scopeRef.buildOption));
+}
 
-export const buildModule =
-  <State extends StateRecord, Actions extends ActionsRecord>(state: State, rawModule: RawModule<State, Actions & DefaultActions<State>>) =>
-  (): HooksModule<State, Actions> => {
+export function buildModule<State extends StateRecord, Actions extends ActionsRecord<State>>(state: State, rawModule: RawModule<State, Actions & ActionsRecord<State>>) {
+  return (): HooksModule<State, Actions> => {
     const buildScope = (props?: ScopeBuildOption<State>): Scope<State, Actions> => {
-      // this function keeps all essential build-module data with closure
-      // it will be called when first used in a React Context
-      // if the component was not wrapped in a React Context, it will use the global one
+      // this function keeps all essential module data within the closure
+      // it will be called when first used inside a Context
+      // if the component was not wrapped in a "Zoov Context", it will use the global one
       const { defaultValue = {}, middleware } = props || {};
+
+      type ScopeReducer<State extends StateRecord> = (state: State, action: { type: string; payload: unknown[] }) => State;
 
       const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
       const stateCreator: StateCreator<any, any, any> = redux(scopeReducer, { ...state, ...defaultValue });
       const middlewares = middleware ? [middleware] : rawModule.middlewares;
 
       const computed: ComputedRecord = {};
-      const cachedActionsMap = new WeakMap<ScopeContext, ActionsRecord>();
+      const cachedActionsMap = new WeakMap<ScopeContext, ActionsRecord<State>>();
 
       const self: Scope<State, Actions> = {
         store: create(middlewares.reduce((acc, middleware) => middleware(acc), stateCreator)),
         getComputed: () => computed,
         getActions: (context: ScopeContext) => {
           const cachedAction = cachedActionsMap.get(context);
-          if (cachedAction) return cachedAction as Actions & DefaultActions<State>;
+          if (cachedAction) return cachedAction as Actions & ActionsRecord<State>;
 
           // build actions
-          let actions = {} as Actions & DefaultActions<State>;
+          let actions = {} as Actions & ActionsRecord<State>;
 
           // the default setState function
           actions.setState = (...args: any[]) => {
@@ -90,15 +87,15 @@ export const buildModule =
           };
 
           // bind Actions with dispatch, build methods
-          const dispatch = self.store.getState().dispatch as (payload: { type: keyof ActionsRecord; payload: any }) => void;
+          const dispatch = self.store.getState().dispatch as (payload: { type: keyof ActionsRecord<State>; payload: any }) => void;
           Object.keys(rawModule.reducers).forEach((key: keyof Actions & string) => {
-            (actions[key] as any) = ((...args: any) => dispatch({ type: key, payload: args })) as Actions[typeof key];
+            actions[key] = ((...args: any) => dispatch({ type: key, payload: args })) as Actions[typeof key];
           });
           const getScope = (module?: HooksModule<any, any>): Scope<any, any> => {
             if (!module) return self;
             return getScopeOrBuild(context, module);
           };
-          const perform: Perform<State, Actions & DefaultActions<State>> = {
+          const perform: Perform<State, Actions & ActionsRecord<State>> = {
             getState: (module?: HooksModule) => getScope(module).getState(),
             getActions: (module?: HooksModule) => getScope(module).getActions(context),
           };
@@ -127,15 +124,16 @@ export const buildModule =
       return getScopeOrBuild(context, module);
     };
 
-    const module: HooksModule<State, Actions> = {
+    const module = {
+      use: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => [module.useState(selector, equalFn), module.useActions()],
       useState: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => useScope().store(selector, equalFn),
       useActions: () => useScope().getActions(useScopeContext()),
       useComputed: () => useScope().getComputed(),
-      use: (...args: any) => [module.useState(...args), module.useActions()],
       getState: (scope = globalScope) => getScopeOrBuild(scope, module).getState(),
       getActions: (scope = globalScope) => getScopeOrBuild(scope, module).getActions(scope),
-      [buildScopeSymbol]: buildScope,
+      [__buildScopeSymbol]: buildScope,
     } as HooksModule<State, Actions>;
 
     return module;
   };
+}
