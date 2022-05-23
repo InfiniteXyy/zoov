@@ -8,7 +8,7 @@ function getFibonacci(index: number): number {
   return getFibonacci(index - 1) + getFibonacci(index - 2);
 }
 
-const { use: useCounter, useComputed: useCounterComputed } = defineModule({ count: 10 })
+const { use: useCounter, useComputed: useCounterComputed } = defineModule({ count: 10, input: '' })
   .actions({
     add: (draft) => draft.count++,
     minus: (draft) => draft.count--,
@@ -29,7 +29,7 @@ const FibonacciResult = () => {
 };
 
 export const WithComputed: FC = memo(() => {
-  const [{ count }, { add, minus }] = useCounter();
+  const [{ count, input }, { add, minus, setState }] = useCounter();
 
   return (
     <div>

@@ -131,6 +131,27 @@ describe('test hooks', function () {
     expect(spy).toBeCalledTimes(2);
   });
 
+  it.skip('should computed not be triggered when not related state changes', () => {
+    // FIXME:xyy
+    const spy = vi.fn();
+    const Module = defineModule({ count: 0, input: '' })
+      .computed({
+        doubled: (state) => {
+          spy();
+          return state.count * 2;
+        },
+      })
+      .build();
+    renderHook(() => {
+      const { doubled } = Module.useComputed();
+      return doubled;
+    });
+    act(() => {
+      Module.getActions().setState('input', '123');
+    });
+    expect(spy).toHaveBeenCalledTimes(1); // only the first time
+  });
+
   it('should methods work', async function () {
     const Module = defineModule({ count: 2 })
       .actions({
