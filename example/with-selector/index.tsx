@@ -10,7 +10,7 @@ const CounterModule = defineModule({ count: 0, input: 'hello' })
   .build();
 
 export const WithSelector: FC = memo(() => {
-  const [{ count, input }, { add }] = CounterModule.use();
+  const [{ count, input }] = CounterModule.use();
 
   return (
     <div>

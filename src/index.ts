@@ -23,4 +23,4 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
 
 export { defineModule, defineProvider, useScopeContext };
 
-export const VERSION = '0.3.1';
+export const VERSION = '0.3.2';

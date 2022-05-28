@@ -1,7 +1,7 @@
 import produce from 'immer';
 import create from 'zustand';
 import { redux } from 'zustand/middleware';
-import { globalScope, useScopeContext } from './context';
+import { globalContext, useScopeContext } from './context';
 import { __buildScopeSymbol } from './types';
 import { simpleMemoizedFn } from './utils';
 
@@ -125,12 +125,12 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
     };
 
     const module = {
-      use: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => [module.useState(selector, equalFn), module.useActions()],
+      use: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => [module.useState(selector, equalFn), module.useActions(), module.useComputed()],
       useState: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => useScope().store(selector, equalFn),
       useActions: () => useScope().getActions(useScopeContext()),
       useComputed: () => useScope().getComputed(),
-      getState: (scope = globalScope) => getScopeOrBuild(scope, module).getState(),
-      getActions: (scope = globalScope) => getScopeOrBuild(scope, module).getActions(scope),
+      getState: (context = globalContext) => getScopeOrBuild(context, module).getState(),
+      getActions: (context = globalContext) => getScopeOrBuild(context, module).getActions(context),
       [__buildScopeSymbol]: buildScope,
     } as HooksModule<State, Actions>;
 

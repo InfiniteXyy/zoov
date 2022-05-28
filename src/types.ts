@@ -12,7 +12,7 @@ export type StateRecord = Record<string, any>;
 export type Reducer<State> = (...args: any) => (state: State) => State;
 export type Action = (...args: any) => void;
 export type ActionsRecord<State> = Record<string, Action> & { setState: SetState<State> };
-export type ComputedRecord = Record<string, (state: any) => any>;
+export type ComputedRecord = Record<string, any>;
 
 export type Perform<State extends StateRecord, Actions extends ActionsRecord<State>> = {
   getActions<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<any, infer A> ? A : never;
@@ -43,7 +43,7 @@ export type ModuleFactory<
   computed<C extends ComputedBuilder<State>>(computed: C): Omit<ModuleFactory<State, Actions, GenComputed<C>, Excluded | 'computed'>, Excluded | 'computed'>;
   methods<MB extends MethodBuilder<State, Actions>>(builder: MB): ModuleFactory<State, ReturnType<MB> & Actions, Computed, Excluded>;
   middleware<M extends MiddlewareBuilder<State>>(middleware: M): Omit<ModuleFactory<State, Actions, Computed, Excluded | 'middleware'>, Excluded | 'middleware'>;
-  build(): Omit<HooksModule<State, Actions, Computed>, typeof __buildScopeSymbol>;
+  build(): HooksModule<State, Actions, Computed>;
 };
 
 export const __buildScopeSymbol = Symbol('buildScope');
@@ -60,7 +60,7 @@ export type ScopeRef = { current?: Scope<any, any>; buildOption?: ScopeBuildOpti
 export type ScopeContext = Map<HooksModule<any, any, any>, ScopeRef>;
 
 export type HooksModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>, Computed extends ComputedRecord = {}> = {
-  use<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): [SelectorResult, Actions];
+  use<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): [SelectorResult, Actions, Computed];
   useState<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
   useActions(): Actions;
   useComputed(): Computed;

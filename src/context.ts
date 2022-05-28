@@ -4,9 +4,9 @@ import type { ScopeContext, HooksModule, ScopeBuildOption, ScopeRef } from './ty
 type HandlerOption<M> = M extends HooksModule<infer State> ? ScopeBuildOption<State> : never;
 type Handler = (handle: <M extends HooksModule<any>>(module: M, options: HandlerOption<M>) => void) => void;
 
-export const globalScope = new Map<HooksModule, ScopeRef>();
+export const globalContext = new Map<HooksModule, ScopeRef>();
 
-const scopeContext = createContext<ScopeContext>(globalScope);
+const scopeContext = createContext<ScopeContext>(globalContext);
 
 export const defineProvider = (handler: Handler) => {
   const overrideScopeMap = new Map<HooksModule, ScopeRef>();

@@ -1,7 +1,8 @@
 import type { Draft } from 'immer';
 import type { StateCreator } from 'zustand';
-import { expectType, expectNotType } from 'tsd';
+import { expectType } from 'tsd';
 import { defineModule } from '../src';
+import { useTrackedModule } from '../src/tracked';
 
 import { ActionsRecord, __buildScopeSymbol } from '../src/types';
 
@@ -46,4 +47,5 @@ expectType<number>(module.useState((state) => state.count));
 // computed
 expectType<ModuleComputed>(module.useComputed());
 // state and action composed
-expectType<[ModuleState, ModuleActions & ModuleMethods]>(module.use());
+expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(module.use());
+expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useTrackedModule(module));

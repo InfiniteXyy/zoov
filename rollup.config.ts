@@ -1,7 +1,7 @@
 import { defineConfig } from 'rollup';
 import typescript from '@rollup/plugin-typescript';
 
-const external = ['zustand', 'zustand/middleware', 'rxjs', 'immer', 'react'];
+const external = ['zustand', 'zustand/middleware', 'rxjs', 'immer', 'react', 'react-tracked'];
 
 const createTypesConfig = (input) => {
   return defineConfig({
@@ -28,5 +28,6 @@ const createBuildConfig = (input, name) => {
 const entries = [
   { input: './src/index.ts', name: 'index' },
   { input: './src/effect.ts', name: 'effect' },
+  { input: './src/tracked.ts', name: 'tracked' },
 ];
 export default defineConfig(entries.flatMap(({ input, name }) => [createTypesConfig(input), createBuildConfig(input, name)]));

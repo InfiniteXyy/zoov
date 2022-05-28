@@ -11,7 +11,7 @@ const CounterModule = defineModule({ count: 0 })
   })
   .build();
 
-const { use: useCounter, useComputed: useCounterComputed } = CounterModule;
+const { use: useCounter } = CounterModule;
 
 function addTwo() {
   // you can get the module state/actions outside components
@@ -20,8 +20,7 @@ function addTwo() {
 }
 
 export const BasicUsage: FC = memo(() => {
-  const [{ count }, { add, minus }] = useCounter();
-  const { doubled } = useCounterComputed();
+  const [{ count }, { add, minus }, { doubled }] = useCounter();
 
   return (
     <div>

@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/index.js",
@@ -19,6 +19,12 @@
       "module": "./dist/esm/effect.mjs",
       "import": "./dist/esm/effect.js",
       "default": "./dist/effect.js"
+    },
+    "./tracked": {
+      "types": "./dist/tracked.d.ts",
+      "module": "./dist/esm/tracked.mjs",
+      "import": "./dist/esm/tracked.js",
+      "default": "./dist/tracked.js"
     }
   },
   "homepage": "https://github.com/InfiniteXyy/zoov",
@@ -38,7 +44,8 @@
     "src",
     "LICENSE",
     "README.md",
-    "effect.d.ts"
+    "effect.d.ts",
+    "tracked.d.ts"
   ],
   "scripts": {
     "build": "rimraf ./dist && rollup -c rollup.config.ts",
@@ -81,10 +88,14 @@
     "immer": ">=7.0.0",
     "react": ">=16.8.0",
     "rxjs": ">=7.0.0",
-    "zustand": ">=3.0.0"
+    "zustand": ">=3.0.0",
+    "react-tracked": ">=1.0.0"
   },
   "peerDependenciesMeta": {
     "rxjs": {
+      "optional": true
+    },
+    "react-tracked": {
       "optional": true
     }
   }

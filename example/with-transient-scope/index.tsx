@@ -7,7 +7,7 @@ const CounterModule = defineModule({ count: 0 })
   })
   .build();
 
-const CounterTransientProvider: FC = ({ children }) => {
+const CounterTransientProvider = ({ children }: { children: React.ReactNode }) => {
   const ScopeProvider = useMemo(() => {
     return defineProvider((handle) => {
       handle(CounterModule, {});

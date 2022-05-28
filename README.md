@@ -5,7 +5,7 @@
 <a href="https://codecov.io/gh/infinitexyy/zoov"><img src="https://img.shields.io/codecov/c/github/infinitexyy/zoov.svg" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
-<a href="https://bundlephobia.com/result?p=zoov"><img src="http://img.badgesize.io/https://unpkg.com/zoov/dist/zoov.js?compression=brotli&label=brotli" alt="brotli"></a>
+<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.3.2" alt="minzip"></a>
 </p>
 
 ## Features
@@ -31,7 +31,7 @@ yarn add zoov
 ## First Glance
 
 ```typescript jsx
-const { use: useCounter, useComputed: useCounterComputed } = defineModule({ count: 0 })
+const { use: useCounter } = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
     minus: (draft) => draft.count--,
@@ -48,12 +48,13 @@ const App = () => {
 
 // state is shared
 const App2 = () => {
-  const { doubled } = useCounterComputed();
+  const [, , { doubled }] = useCounter();
   return <div>doubled: {doubled}</div>;
 };
 ```
 
 ## More Examples
+
 ### Use Methods
 
 ```typescript jsx
@@ -105,6 +106,13 @@ const App = () => {
   const [count] = useCounter((state) => state.count);
   return <span>{count}</span>;
 };
+```
+
+Additionally, you can install [react-tracked](https://github.com/dai-shi/react-tracked) and use `useTrackedModule` to automatically generate selector
+
+```tsx
+// will not rerender unless "count" changes
+const [{ count }, { add }] = useTrackedModule(Module);
 ```
 
 ### Use Middleware
@@ -165,6 +173,6 @@ const actions = module.getActions();
 const state = module.getActions();
 
 // you can specify the scope with params
-const scope = useScopeContext();
-const scopeActions = module.getActions(scope);
+const context = useScopeContext();
+const scopeActions = module.getActions(context);
 ```

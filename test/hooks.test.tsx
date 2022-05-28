@@ -70,9 +70,7 @@ describe('test hooks', function () {
       })
       .build();
     const { result } = renderHook(() => {
-      const { doubled, tripled } = Module.useComputed();
-      const { add } = Module.useActions();
-      const { count } = Module.useState();
+      const [{ count }, { add }, { doubled, tripled }] = Module.use();
       return { count, doubled, tripled, add };
     });
     expect(result.current.count).toBe(0);

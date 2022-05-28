@@ -1,6 +1,10 @@
 ## 0.4.0
 - [WIP] feat: `computed` now will auto be updated when it's deps updated.
 
+## 0.3.2
+- feat: `module.use` will return `computed` as third value
+- feat: support `react-tracked` with `useTrackedModule`
+
 ## 0.3.1
 - chore: refactor type definitions
 
