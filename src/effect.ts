@@ -1,3 +1,4 @@
+/* An adapter for rxjs  */
 import { Subject } from 'rxjs';
 import type { Observable } from 'rxjs';
 

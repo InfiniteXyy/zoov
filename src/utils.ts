@@ -1,7 +1,7 @@
 import { createProxy, isChanged } from 'proxy-compare';
-// inspired by https://github.com/alexreardon/memoize-one Copyright (c) 2019 Alexander Reardon
-// deps change based on proxy-compare by dai-shi https://github.com/dai-shi/proxy-compare
 
+// memoize function inspired by https://github.com/alexreardon/memoize-one
+// deps-change detection based on proxy-compare by dai-shi https://github.com/dai-shi/proxy-compare
 export function simpleMemoizedFn<T extends (state: any) => any>(fn: T) {
   const affected = new WeakMap();
   let cache: { lastResult: ReturnType<T>; lastState: Parameters<T>[0] } | null = null;

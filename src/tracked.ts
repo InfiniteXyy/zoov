@@ -1,3 +1,4 @@
+//* An adapter for react-tracked  */
 import { createTrackedSelector } from 'react-tracked';
 import { ActionsRecord, ComputedRecord, HooksModule, StateRecord } from './types';
 
