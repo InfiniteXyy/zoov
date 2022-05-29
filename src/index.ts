@@ -22,7 +22,7 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
   });
 }
 
-// Just a shortcut for module.use
+// Just a shortcut of module.use
 function useModule<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord, StateResult = State>(
   module: HooksModule<State, Actions, Computed>,
   selector?: StateSelector<State, StateResult>,
@@ -31,12 +31,12 @@ function useModule<State extends StateRecord, Actions extends ActionsRecord<Stat
   return module.use(selector, equalityFn);
 }
 
-// Just a shortcut for module.useActions
+// Just a shortcut of module.useActions
 function useModuleActions<State extends StateRecord, Actions extends ActionsRecord<State>>(module: HooksModule<State, Actions>) {
   return module.useActions();
 }
 
-// Just a shortcut for module.useComputed
+// Just a shortcut of module.useComputed
 function useModuleComputed<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord>(module: HooksModule<State, Actions, Computed>) {
   return module.useComputed();
 }
