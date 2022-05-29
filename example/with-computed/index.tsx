@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FC, memo, useRef } from 'react';
 import { defineModule } from '../../src';
 
 function getFibonacci(index: number): number {
@@ -18,15 +18,16 @@ const { use: useCounter, useComputed: useCounterComputed } = defineModule({ coun
       const result = getFibonacci(state.count);
       console.log(`fibonacci ${state.count} = ${result}`);
       // Heavy work
-      return result;
+      return { result: result };
     },
   })
   .build();
 
-const FibonacciResult = () => {
+const FibonacciResult = memo(() => {
   const { fibonacci } = useCounterComputed();
-  return <b style={{ marginLeft: 4 }}>{fibonacci}</b>;
-};
+  console.log('fibonacci rerender');
+  return <b style={{ marginLeft: 4 }}>{fibonacci.result}</b>;
+});
 
 export const WithComputed: FC = memo(() => {
   const [{ count, input }, { add, minus, setState }] = useCounter();
@@ -35,6 +36,9 @@ export const WithComputed: FC = memo(() => {
     <div>
       <h3>With Computed</h3>
       <small>The result will not be computed multiple times</small>
+      <div>
+        <input value={input} onChange={(e) => setState('input', e.target.value)} />
+      </div>
       <p>
         fibonacci {count} =
         <FibonacciResult />
