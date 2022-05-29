@@ -11,6 +11,7 @@ specifiers:
   immer: ^9.0.14
   jsdom: ^19.0.0
   prettier: ^2.6.2
+  proxy-compare: ^2.1.0
   react: ^18.1.0
   react-dom: ^18.1.0
   react-tracked: ^1.7.9
@@ -25,6 +26,9 @@ specifiers:
   vite: ^2.9.9
   vitest: ^0.12.9
   zustand: ^4.0.0-rc.1
+
+dependencies:
+  proxy-compare: 2.1.0
 
 devDependencies:
   '@rollup/plugin-typescript': 8.3.2_259b674e2843eb0fd9f2d7fd95b5b7a6
@@ -2461,7 +2465,6 @@ packages:
 
   /proxy-compare/2.1.0:
     resolution: {integrity: sha512-wapJ3h/w8fRSyPEG0y2WMV+tf9xwvj3nxM6aHVuPEOwKs/t5xLSKZb44ubNTiqq2T6lmEMHEWGMTaU2L6ddaFA==}
-    dev: true
 
   /psl/1.8.0:
     resolution: {integrity: sha512-RIdOzyoavK+hA18OGGWDqUTsCLhtA7IcZ/6NCs4fFJaHBDab+pDDmDIByWFRQJq2Cd7r1OoQxBGKOaztq+hjIQ==}

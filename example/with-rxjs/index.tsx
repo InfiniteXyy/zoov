@@ -4,7 +4,7 @@ import { effect } from '../../src/effect';
 import { exhaustMap, tap } from 'rxjs/operators';
 import { timer } from 'rxjs';
 
-const CounterModule = defineModule({ count: 0 })
+const counterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
   })
@@ -20,7 +20,7 @@ const CounterModule = defineModule({ count: 0 })
   .build();
 
 export const WithRxJS: FC = memo(() => {
-  const [{ count }, { addAfter }] = CounterModule.use();
+  const [{ count }, { addAfter }] = counterModule.use();
 
   const addOne = useCallback(() => {
     addAfter(300);

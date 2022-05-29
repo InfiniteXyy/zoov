@@ -1,11 +1,14 @@
 <h1 align="center">ZOOV</h1>
-<p align="center">✨ ZOOV = Zustand + Module</p>
+<p align="center">✨ ZOOV = Zustand + module</p>
 <p align="center">
 <a href="https://github.com/infinitexyy/zoov/actions"><img src="https://img.shields.io/github/workflow/status/infinitexyy/zoov/main.svg" alt="Build Status"></a>
 <a href="https://codecov.io/gh/infinitexyy/zoov"><img src="https://img.shields.io/codecov/c/github/infinitexyy/zoov.svg" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
-<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.3.2" alt="minzip"></a>
+<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.3.3" alt="minzip"></a>
+</p>
+<p align="center">
+<a href="https://zoov.xyynext.xyz">React the docs</a>
 </p>
 
 ## Features
@@ -60,7 +63,7 @@ const App2 = () => {
 ```typescript jsx
 import { effect } from 'zoov/effect';
 
-const CounterModule = defineModule({ count: 0 })
+const counterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
     minus: (draft) => draft.count--,
@@ -112,14 +115,14 @@ Additionally, you can install [react-tracked](https://github.com/dai-shi/react-t
 
 ```tsx
 // will not rerender unless "count" changes
-const [{ count }, { add }] = useTrackedModule(Module);
+const [{ count }, { add }] = useTrackedModule(module);
 ```
 
 ### Use Middleware
 
 ```typescript jsx
 // see more examples in https://github.com/pmndrs/zustand/blob/master/src/middleware.ts
-const Module = defineModule({ count: 0 })
+const module = defineModule({ count: 0 })
   .actions({ add: (draft) => draft.count++ })
   .middleware((store) => persist(store, { name: 'counter' }))
   .build();
@@ -143,17 +146,17 @@ setState('nested', 'checked', (v) => !v);
 import { defineProvider } from 'zoov';
 
 const CustomProvider = defineProvider((handle) => {
-  // create a new Module scope for all its children(can be nested)
-  handle(YourModule, {
+  // create a new module scope for all its children(can be nested)
+  handle(yourModule, {
     defaultState: {},
   });
-  handle(AnotherModule, {
+  handle(anotherModule, {
     defaultState: {},
   });
 });
 
 const App = () => {
-  // if a Module is not handled by any of its parent, then used global scope
+  // if a module is not handled by any of its parent, then used global scope
   return (
     <div>
       <CustomProvider>

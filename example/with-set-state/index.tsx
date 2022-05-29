@@ -1,19 +1,19 @@
 import React, { FC, memo } from 'react';
 import { defineModule } from '../../src';
 
-const Module = defineModule({ info: { name: 'xyy', age: 12 }, checked: false }).build();
+const module = defineModule({ info: { name: 'xyy', age: 12 }, checked: false }).build();
 
-const AnotherModule = defineModule({})
+const anotherModule = defineModule({})
   .methods(({ getActions }) => ({
     toggleChecked: () => {
-      getActions(Module).setState('checked', (checked) => !checked);
+      getActions(module).setState('checked', (checked) => !checked);
     },
   }))
   .build();
 
 export const WithSetState: FC = memo(() => {
-  const [state, { setState }] = Module.use();
-  const { toggleChecked } = AnotherModule.useActions();
+  const [state, { setState }] = module.use();
+  const { toggleChecked } = anotherModule.useActions();
 
   return (
     <div>

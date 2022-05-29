@@ -1,6 +1,6 @@
 import { act, renderHook, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { defineModule } from '../src';
+import { defineModule, useModule, useModuleActions, useModuleComputed } from '../src';
 import { effect } from '../src/effect';
 import { map, throttleTime } from 'rxjs/operators';
 import { MiddlewareBuilder } from '../src/types';
@@ -11,10 +11,10 @@ describe('test hooks', function () {
   afterEach(cleanup);
   const emptyModule = defineModule<State>({ count: 0, input: '' });
 
-  it('should simple action works', function () {
-    const Module = emptyModule.actions({ add: (draft) => (draft.count += 1) }).build();
+  it('should action works', function () {
+    const module = emptyModule.actions({ add: (draft) => (draft.count += 1) }).build();
     const { result } = renderHook(() => {
-      const [{ count }, { add }] = Module.use();
+      const [{ count }, { add }] = module.use();
       return { count, add };
     });
     expect(result.current.count).toBe(0);
@@ -24,10 +24,10 @@ describe('test hooks', function () {
     expect(result.current.count).toBe(1);
   });
 
-  it('should multiple params action works', function () {
-    const Module = emptyModule.actions({ add: (draft, value1: number, value2: number) => (draft.count += value1 + value2) }).build();
+  it('should action with multiple params works', function () {
+    const module = emptyModule.actions({ add: (draft, value1: number, value2: number) => (draft.count += value1 + value2) }).build();
     const { result } = renderHook(() => {
-      const [{ count }, { add }] = Module.use();
+      const [{ count }, { add }] = module.use();
       return { count, add };
     });
     expect(result.current.count).toBe(0);
@@ -37,8 +37,8 @@ describe('test hooks', function () {
     expect(result.current.count).toBe(5);
   });
 
-  it('should selector works', function () {
-    const Module = emptyModule
+  it('should state selector works', function () {
+    const module = emptyModule
       .actions({
         add: (draft) => (draft.count += 1),
         setInput: (draft, input: string) => (draft.input = input),
@@ -46,7 +46,7 @@ describe('test hooks', function () {
       .build();
     const spy = vi.fn();
     const { result } = renderHook(() => {
-      const [input, { add }] = Module.use((state) => state.input);
+      const [input, { add }] = module.use((state) => state.input);
       spy(input);
       return { input, add };
     });
@@ -56,7 +56,7 @@ describe('test hooks', function () {
 
   it('should computed works', function () {
     const spy = vi.fn();
-    const Module = emptyModule
+    const module = emptyModule
       .actions({
         add: (draft, value: number) => (draft.count += value),
       })
@@ -70,7 +70,7 @@ describe('test hooks', function () {
       })
       .build();
     const { result } = renderHook(() => {
-      const [{ count }, { add }, { doubled, tripled }] = Module.use();
+      const [{ count }, { add }, { doubled, tripled }] = module.use();
       return { count, doubled, tripled, add };
     });
     expect(result.current.count).toBe(0);
@@ -82,27 +82,9 @@ describe('test hooks', function () {
     expect(spy).toBeCalledTimes(0);
   });
 
-  it('should computed work without state', function () {
-    const Module = emptyModule
-      .actions({
-        add: (draft, value: number) => (draft.count += value),
-      })
-      .computed({
-        doubled: (state) => state.count * 2,
-      })
-      .build();
-    const { result } = renderHook(() => {
-      const { doubled } = Module.useComputed();
-      const { add } = Module.useActions();
-      return { doubled, add };
-    });
-    act(() => void result.current.add(2));
-    expect(result.current.doubled).toBe(4);
-  });
-
-  it('should pure computed only be triggered once', function () {
+  it('should computed only be triggered once when state not changed', function () {
     const spy = vi.fn();
-    const Module = emptyModule
+    const module = emptyModule
       .actions({
         add: (draft, value: number) => (draft.count += value),
       })
@@ -115,13 +97,13 @@ describe('test hooks', function () {
       .build();
 
     const { result } = renderHook(() => {
-      const { doubled } = Module.useComputed();
-      const { add } = Module.useActions();
+      const { doubled } = module.useComputed();
+      const { add } = module.useActions();
       return { doubled, add };
     });
 
     renderHook(() => {
-      const { doubled } = Module.useComputed();
+      const { doubled } = module.useComputed();
       return { doubled };
     });
     expect(spy).toBeCalledTimes(1);
@@ -129,10 +111,9 @@ describe('test hooks', function () {
     expect(spy).toBeCalledTimes(2);
   });
 
-  it.skip('should computed not be triggered when not related state changes', () => {
-    // FIXME:xyy
+  it("should computed only be triggered when it's dependency changes", () => {
     const spy = vi.fn();
-    const Module = defineModule({ count: 0, input: '' })
+    const module = defineModule({ count: 0, input: '' })
       .computed({
         doubled: (state) => {
           spy();
@@ -141,17 +122,17 @@ describe('test hooks', function () {
       })
       .build();
     renderHook(() => {
-      const { doubled } = Module.useComputed();
+      const { doubled } = module.useComputed();
       return doubled;
     });
     act(() => {
-      Module.getActions().setState('input', '123');
+      module.getActions().setState('input', '123');
     });
     expect(spy).toHaveBeenCalledTimes(1); // only the first time
   });
 
-  it('should methods work', async function () {
-    const Module = defineModule({ count: 2 })
+  it('should methods works', async function () {
+    const module = defineModule({ count: 2 })
       .actions({
         add: (draft, value: number) => (draft.count += value),
         reset: (draft) => (draft.count = 2),
@@ -176,7 +157,7 @@ describe('test hooks', function () {
       .build();
 
     const { result } = renderHook(() => {
-      const [{ count }, actions] = Module.use();
+      const [{ count }, actions] = module.use();
       return { count, ...actions };
     });
     act(() => void result.current.multBy(3));
@@ -209,14 +190,14 @@ describe('test hooks', function () {
         mutation
       );
 
-    const Module = emptyModule
+    const module = emptyModule
       .actions({
         add: (draft, value: number) => (draft.count += value),
       })
       .middleware((store) => middleware(store))
       .build();
     const { result } = renderHook(() => {
-      const [{ count }, { add }] = Module.use();
+      const [{ count }, { add }] = module.use();
       return { count, add };
     });
     act(() => {
@@ -229,16 +210,16 @@ describe('test hooks', function () {
     expect(spy).toBeCalledTimes(2);
   });
 
-  it('should default setState works', () => {
-    const Module = defineModule({ deep: { name: 'xyy', age: 12 }, checked: false })
+  it('should setState action works', () => {
+    const module = defineModule({ deep: { name: 'xyy', age: 12 }, checked: false })
       .actions({
         hello: () => {},
       })
       .build();
 
     const { result } = renderHook(() => {
-      const { setState, hello } = Module.useActions();
-      const state = Module.useState();
+      const { setState, hello } = module.useActions();
+      const state = module.useState();
       return { setState, state, hello };
     });
 
@@ -250,5 +231,23 @@ describe('test hooks', function () {
 
     act(() => void result.current.setState('deep', 'age', (age) => age + 1));
     expect(result.current.state.deep.age).toBe(14);
+  });
+});
+
+describe('test shortcut hooks', () => {
+  it('should shortcut hooks return the same as module hooks', () => {
+    const module = defineModule({ count: 0 })
+      .actions({
+        add: (draft, value: number) => (draft.count += value),
+      })
+      .computed({ doubled: (state) => state.count * 2 })
+      .build();
+    const { result } = renderHook(() => {
+      return { use: module.use(), useActions: module.useActions(), useComputed: module.useComputed() };
+    });
+    const { result: result2 } = renderHook(() => {
+      return { use: useModule(module), useActions: useModuleActions(module), useComputed: useModuleComputed(module) };
+    });
+    expect(result.current).toStrictEqual(result2.current);
   });
 });

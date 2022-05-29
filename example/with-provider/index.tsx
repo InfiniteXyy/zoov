@@ -2,13 +2,13 @@ import React, { FC, memo } from 'react';
 import { defineModule, defineProvider } from '../../src';
 import { persist } from 'zustand/middleware';
 
-const LogModule = defineModule({ prefix: 'global log: ' })
+const logModule = defineModule({ prefix: 'global log: ' })
   .methods(({ getState }) => ({
     log: (value: string | number) => console.log(`${getState().prefix}${value}`),
   }))
   .build();
 
-const CounterModule = defineModule({ count: 0 })
+const counterModule = defineModule({ count: 0 })
   .actions({
     add: (draft, value: number) => {
       draft.count += value;
@@ -18,27 +18,27 @@ const CounterModule = defineModule({ count: 0 })
   .methods(({ getActions }) => ({
     addOne: () => {
       getActions().add(1);
-      getActions(LogModule).log('perform addOne');
+      getActions(logModule).log('perform addOne');
     },
   }))
   .build();
 
 const LogProvider = defineProvider((handle) => {
-  handle(LogModule, {
+  handle(logModule, {
     defaultValue: { prefix: 'custom log: ' },
   });
 });
 
 const PersistProvider = defineProvider((handle) => {
-  handle(CounterModule, {
+  handle(counterModule, {
     defaultValue: { count: 1 },
     middleware: (store) => persist(store, { name: 'count2' }),
   });
 });
 
 const Counter: React.FC<{ title: string }> = ({ title }) => {
-  const { count } = CounterModule.useState();
-  const { addOne } = CounterModule.useActions();
+  const { count } = counterModule.useState();
+  const { addOne } = counterModule.useActions();
   return (
     <div>
       <p>

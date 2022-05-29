@@ -1,6 +1,7 @@
+import { EqualityChecker, StateSelector } from 'zustand';
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
 import { defineProvider, useScopeContext } from './context';
-import type { ModuleFactory, RawModule, StateRecord } from './types';
+import type { ActionsRecord, ComputedRecord, HooksModule, ModuleFactory, RawModule, StateRecord } from './types';
 
 function factory<State extends StateRecord>(state: State, rawModule: RawModule<any, any>): ModuleFactory<State, any, any> {
   return {
@@ -21,6 +22,25 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
   });
 }
 
-export { defineModule, defineProvider, useScopeContext };
+// Just a shortcut for module.use
+function useModule<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord, StateResult = State>(
+  module: HooksModule<State, Actions, Computed>,
+  selector?: StateSelector<State, StateResult>,
+  equalityFn?: EqualityChecker<StateResult>
+): [StateResult, Actions, Computed] {
+  return module.use(selector, equalityFn);
+}
 
-export const VERSION = '0.3.2';
+// Just a shortcut for module.useActions
+function useModuleActions<State extends StateRecord, Actions extends ActionsRecord<State>>(module: HooksModule<State, Actions>) {
+  return module.useActions();
+}
+
+// Just a shortcut for module.useComputed
+function useModuleComputed<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord>(module: HooksModule<State, Actions, Computed>) {
+  return module.useComputed();
+}
+
+export { defineModule, defineProvider, useScopeContext, useModule, useModuleActions, useModuleComputed };
+
+export const VERSION = '0.3.3';

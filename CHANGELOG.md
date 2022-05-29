@@ -1,5 +1,6 @@
-## 0.4.0
-- [WIP] feat: `computed` now will auto be updated when it's deps updated.
+## 0.3.3
+- feat: `computed` now will only be triggered when it's deps updated (based on react-tracked).
+- feat: add `useModule` & `useModuleActions` shortcut hooks
 
 ## 0.3.2
 - feat: `module.use` will return `computed` as third value

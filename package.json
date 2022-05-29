@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/index.js",
@@ -84,12 +84,15 @@
     "vitest": "^0.12.9",
     "zustand": "^4.0.0-rc.1"
   },
+  "dependencies": {
+    "proxy-compare": "^2.1.0"
+  },
   "peerDependencies": {
     "immer": ">=7.0.0",
     "react": ">=16.8.0",
+    "react-tracked": ">=1.0.0",
     "rxjs": ">=7.0.0",
-    "zustand": ">=3.0.0",
-    "react-tracked": ">=1.0.0"
+    "zustand": ">=3.0.0"
   },
   "peerDependenciesMeta": {
     "rxjs": {

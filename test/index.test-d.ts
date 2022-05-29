@@ -1,7 +1,7 @@
 import type { Draft } from 'immer';
 import type { StateCreator } from 'zustand';
 import { expectType } from 'tsd';
-import { defineModule } from '../src';
+import { defineModule, useModule, useModuleActions, useModuleComputed } from '../src';
 import { useTrackedModule } from '../src/tracked';
 
 import { ActionsRecord, __buildScopeSymbol } from '../src/types';
@@ -42,10 +42,33 @@ const module = defineModule<ModuleState>({ count: 0 })
 expectType<ModuleState>(module.useState());
 // actions only
 expectType<ModuleActions & ModuleMethods>(module.useActions());
+expectType<ModuleActions & ModuleMethods>(useModuleActions(module));
 // state selector
-expectType<number>(module.useState((state) => state.count));
+expectType<{ doubled: number }>(
+  module.useState(
+    (state) => ({ doubled: state.count * 2 }),
+    (a, b) => {
+      expectType<{ doubled: number }>(a);
+      expectType<{ doubled: number }>(b);
+      return a === b;
+    }
+  )
+);
+expectType<{ doubled: number }>(
+  useModule(
+    module,
+    (state) => ({ doubled: state.count * 2 }),
+    (a, b) => {
+      expectType<{ doubled: number }>(a);
+      expectType<{ doubled: number }>(b);
+      return a === b;
+    }
+  )[0]
+);
 // computed
 expectType<ModuleComputed>(module.useComputed());
+expectType<ModuleComputed>(useModuleComputed(module));
 // state and action composed
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(module.use());
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useTrackedModule(module));
+expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useModule(module));

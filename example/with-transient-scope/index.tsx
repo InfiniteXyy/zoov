@@ -1,7 +1,7 @@
 import React, { FC, memo, useMemo } from 'react';
 import { defineModule, defineProvider } from '../../src';
 
-const CounterModule = defineModule({ count: 0 })
+const counterModule = defineModule({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
   })
@@ -10,14 +10,14 @@ const CounterModule = defineModule({ count: 0 })
 const CounterTransientProvider = ({ children }: { children: React.ReactNode }) => {
   const ScopeProvider = useMemo(() => {
     return defineProvider((handle) => {
-      handle(CounterModule, {});
+      handle(counterModule, {});
     });
   }, []);
   return <ScopeProvider>{children}</ScopeProvider>;
 };
 
 const Counter: FC = memo(() => {
-  const [{ count }, { add }] = CounterModule.use();
+  const [{ count }, { add }] = counterModule.use();
   return <button onClick={add}>{count}</button>;
 });
 

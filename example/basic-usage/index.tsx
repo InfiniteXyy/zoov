@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 import { defineModule } from '../../src';
 
-const CounterModule = defineModule({ count: 0 })
+const counterModule = defineModule({ count: 0 })
   .actions({
     add: (draft, payload: number = 1) => (draft.count += payload),
     minus: (draft, payload: number = 1) => (draft.count -= payload),
@@ -11,12 +11,12 @@ const CounterModule = defineModule({ count: 0 })
   })
   .build();
 
-const { use: useCounter } = CounterModule;
+const { use: useCounter } = counterModule;
 
 function addTwo() {
   // you can get the module state/actions outside components
-  CounterModule.getActions().add(2);
-  console.log('after add 2, count is: ' + CounterModule.getState().count);
+  counterModule.getActions().add(2);
+  console.log('after add 2, count is: ' + counterModule.getState().count);
 }
 
 export const BasicUsage: FC = memo(() => {

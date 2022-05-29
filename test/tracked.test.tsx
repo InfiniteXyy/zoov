@@ -5,7 +5,7 @@ import { defineModule } from '../src';
 import { useTrackedModule } from '../src/tracked';
 
 describe('test tracked-module', function () {
-  it('should react-tracked adapter work', function () {
+  it('should react-tracked adapter works', function () {
     const spy = vi.fn();
     const module = defineModule({ count: 0, input: '' })
       .computed({ doubled: (state) => state.count * 2 })

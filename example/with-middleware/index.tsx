@@ -18,7 +18,7 @@ const log =
       mutation
     );
 
-const CounterModule = defineModule<State>({ count: 0 })
+const counterModule = defineModule<State>({ count: 0 })
   .actions({
     add: (draft) => draft.count++,
     reset: (draft) => (draft.count = 0),
@@ -27,7 +27,7 @@ const CounterModule = defineModule<State>({ count: 0 })
   .build();
 
 export const WithMiddleware: FC = memo(() => {
-  const [{ count }, { add, reset }] = CounterModule.use();
+  const [{ count }, { add, reset }] = counterModule.use();
 
   return (
     <div>

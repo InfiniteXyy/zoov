@@ -16,10 +16,10 @@ describe('test scope context', () => {
 
   afterEach(() => {
     cleanup();
-    Module.getActions().setCount(0);
+    module.getActions().setCount(0);
   });
 
-  const LogModule = defineModule({ prefix: 'global' })
+  const logModule = defineModule({ prefix: 'global' })
     .methods(({ getState }) => ({
       log: (content: string) => {
         logSpy(getState().prefix + content);
@@ -27,20 +27,20 @@ describe('test scope context', () => {
     }))
     .build();
 
-  const Module = defineModule<State>({ count: 0 })
+  const module = defineModule<State>({ count: 0 })
     .actions({
       setCount: (draft, value) => (draft.count = value),
     })
     .methods(({ getActions, getState }) => ({
       add() {
         getActions().setCount(getState().count + 1);
-        getActions(LogModule).log('');
+        getActions(logModule).log('');
       },
     }))
     .build();
 
   const Counter = ({ testId }: { testId: string }) => {
-    const [{ count }, { add }] = Module.use();
+    const [{ count }, { add }] = module.use();
     return (
       <button data-testid={testId} onClick={add}>
         {count}
@@ -50,7 +50,7 @@ describe('test scope context', () => {
 
   it('should provider override state success', function () {
     const Provider = defineProvider((handle) => {
-      handle(Module, {
+      handle(module, {
         defaultValue: { count: 1 },
       });
     });
@@ -75,36 +75,26 @@ describe('test scope context', () => {
     expect(inner.textContent).toBe('2');
   });
 
-  it('should provider get ', function () {
+  it('should provider override middleware success', function () {
+    const originalMiddleware = vi.fn().mockImplementation((i) => i);
+    const handledMiddleware = vi.fn().mockImplementation((i) => i);
+    const module = defineModule({}).middleware(originalMiddleware).build();
     const Provider = defineProvider((handle) => {
-      handle(Module, {
-        defaultValue: { count: 1 },
-      });
+      handle(module, { defaultValue: {}, middleware: handledMiddleware });
     });
-
-    const container = render(
-      <div>
-        <Counter testId={'outer'} />
-        <Provider>
-          <Counter testId={'inner'} />
-        </Provider>
-      </div>
+    const Component = () => (module.use(), (<></>));
+    render(
+      <Provider>
+        <Component />
+      </Provider>
     );
-
-    const outer = container.getByTestId('outer');
-    const inner = container.getByTestId('inner');
-    expect(outer.textContent).toBe('0');
-    expect(inner.textContent).toBe('1');
-    act(() => {
-      fireEvent.click(inner);
-    });
-    expect(outer.textContent).toBe('0');
-    expect(inner.textContent).toBe('2');
+    expect(originalMiddleware).not.toBeCalled();
+    expect(handledMiddleware).toBeCalled();
   });
 
-  it('should outer provider works', function () {
+  it('should provider merge context works', function () {
     const LogProvider = defineProvider((handle) => {
-      handle(LogModule, {
+      handle(logModule, {
         defaultValue: { prefix: 'custom' },
       });
     });
@@ -127,34 +117,34 @@ describe('test scope context', () => {
     expect(logSpy).toHaveBeenNthCalledWith(2, 'custom');
   });
 
-  it('should static getState/getActions works, using the global scope', () => {
-    const Module = defineModule<State>({ count: 0 })
+  it('should static getState/getActions works', () => {
+    const module = defineModule<State>({ count: 0 })
       .actions({
         setCount: (draft, value) => (draft.count = value),
       })
       .build();
-    expect(Module.getState().count).toEqual(0);
-    expect(Module.getActions().setCount).toBeTypeOf('function');
-    Module.getActions().setCount(2);
-    expect(Module.getState().count).toBe(2);
+    expect(module.getState().count).toEqual(0);
+    expect(module.getActions().setCount).toBeTypeOf('function');
+    module.getActions().setCount(2);
+    expect(module.getState().count).toBe(2);
   });
 
   it('should static getState/getActions works under a scope', () => {
     const Provider = defineProvider((handle) => {
-      handle(Module, {
+      handle(module, {
         defaultValue: { count: 123 },
       });
     });
 
     const Counter = ({ testId }: { testId: string }) => {
       const scope = useScopeContext();
-      const { count } = Module.useState();
+      const { count } = module.useState();
 
       const mutateCount = useCallback(() => {
         // inner be 43
-        Module.getActions(scope).setCount(43);
+        module.getActions(scope).setCount(43);
         // outer be 996
-        Module.getActions().setCount(996);
+        module.getActions().setCount(996);
       }, []);
 
       return (
