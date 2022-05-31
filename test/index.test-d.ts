@@ -10,7 +10,7 @@ import { ActionsRecord, __buildScopeSymbol } from '../src/types';
 type ModuleState = { count: number };
 type ModuleComputed = { doubled: number };
 type ModuleActions = ActionsRecord<ModuleState> & { add: (count?: number) => void };
-type ModuleMethods = { addAsync(count?: number): Promise<void> };
+type ModuleMethods = { addAsync(count?: number): Promise<void> } & { methodWithThis(payload: string): void };
 
 const module = defineModule<ModuleState>({ count: 0 })
   .actions({
@@ -34,8 +34,9 @@ const module = defineModule<ModuleState>({ count: 0 })
     },
   }))
   .methods({
-    example() {
-      expectType<{ getActions: () => ModuleActions; getState: () => ModuleState }>(this);
+    methodWithThis(_payload: string) {
+      expectType<ModuleActions & Omit<ModuleMethods, 'methodWithThis'>>(this.getActions());
+      expectType<ModuleState>(this.getState());
     },
   })
   .middleware((store) => {
