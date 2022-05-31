@@ -69,23 +69,22 @@ const counterModule = defineModule({ count: 0 })
     minus: (draft) => draft.count--,
   })
   .methods(({ getActions }) => {
-    const { add, minus } = getActions();
     return {
       addAndMinus: () => {
-        add();
-        add();
-        setTimeout(() => minus(), 100);
+        getActions().add();
+        getActions().add();
+        setTimeout(() => getActions().minus(), 100);
       },
       // async function is supported
       asyncAdd: async () => {
         await something();
-        add();
+        getActions().add();
       },
       // [TIPS] If you want to `rxjs` in `zoov`, your should first install `rxjs`
       addAfter: effect<number>((payload$) =>
         payload$.pipe(
           exhaustMap((timeout) => {
-            return timer(timeout).pipe(tap(() => add()));
+            return timer(timeout).pipe(tap(() => getActions().add()));
           })
         )
       ),
