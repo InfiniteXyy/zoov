@@ -9,7 +9,10 @@ import type { EqualityChecker, StateCreator, StateSelector } from 'zustand';
 import type { ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext, Scope, Reducer } from './types';
 import type { Perform, ScopeBuildOption, MethodBuilder, MiddlewareBuilder, Action, ActionsRecord } from './types';
 
-export function extendActions<State, Actions extends ActionsRecord<State>>(rawActions: Actions, rawModule: RawModule<State, Actions>): RawModule<State, Actions> {
+export function extendActions<State extends StateRecord, Actions extends ActionsRecord<State>>(
+  rawActions: Actions,
+  rawModule: RawModule<State, Actions>
+): RawModule<State, Actions> {
   const reducerKeys: (keyof Actions)[] = Object.keys(rawActions);
   const reducers = reducerKeys.reduce((acc, key) => {
     acc[key] = (...args: unknown[]) => produce((draft) => void rawActions[key](draft, ...args));
@@ -22,15 +25,15 @@ export function extendComputed(computed: ComputedRecord, rawModule: RawModule): 
   return { ...rawModule, computed };
 }
 
-export function extendMethods<State, Actions extends ActionsRecord<State>>(builder: MethodBuilder<State, Actions>, rawModule: RawModule): RawModule {
+export function extendMethods<State extends StateRecord, Actions extends ActionsRecord<State>>(builder: MethodBuilder<State, Actions>, rawModule: RawModule): RawModule {
   return { ...rawModule, methodsBuilders: [...rawModule.methodsBuilders, builder] };
 }
 
-export function extendMiddleware<State>(middleware: MiddlewareBuilder<State>, rawModule: RawModule<State>): RawModule<State> {
+export function extendMiddleware<State extends StateRecord>(middleware: MiddlewareBuilder<State>, rawModule: RawModule<State>): RawModule<State> {
   return { ...rawModule, middlewares: [...rawModule.middlewares, middleware] };
 }
 
-function getScopeOrBuild<State, Actions extends ActionsRecord<State>>(context: ScopeContext, module: HooksModule<State, Actions>): Scope<State, Actions> {
+function getScopeOrBuild<State extends StateRecord, Actions extends ActionsRecord<State>>(context: ScopeContext, module: HooksModule<State, Actions>): Scope<State, Actions> {
   let scopeRef = context.get(module);
   if (!scopeRef) {
     scopeRef = {};
@@ -95,13 +98,19 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
             if (!module) return self;
             return getScopeOrBuild(context, module);
           };
+          let isBuildingMethods = false;
           const perform: Perform<State, Actions & ActionsRecord<State>> = {
             getState: (module?: HooksModule) => getScope(module).getState(),
-            getActions: (module?: HooksModule) => getScope(module).getActions(context),
+            getActions: (module?: HooksModule) => {
+              if (isBuildingMethods) throw new Error('should not call getActions in a builder function, getActions in a methods instead');
+              return getScope(module).getActions(context);
+            },
           };
+          isBuildingMethods = true;
           rawModule.methodsBuilders.forEach((builder) => {
             actions = { ...actions, ...builder(perform) };
           });
+          isBuildingMethods = false;
           cachedActionsMap.set(context, actions);
           return actions;
         },

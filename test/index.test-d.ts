@@ -2,8 +2,9 @@ import type { Draft } from 'immer';
 import type { StateCreator } from 'zustand';
 import { expectType } from 'tsd';
 import { defineModule, useModule, useModuleActions, useModuleComputed } from '../src';
+import { Observable } from 'rxjs';
+import { effect } from '../src/effect';
 import { useTrackedModule } from '../src/tracked';
-
 import { ActionsRecord, __buildScopeSymbol } from '../src/types';
 
 type ModuleState = { count: number };
@@ -72,3 +73,10 @@ expectType<ModuleComputed>(useModuleComputed(module));
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(module.use());
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useTrackedModule(module));
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useModule(module));
+
+// effect
+const fn = effect<void>((payload) => {
+  expectType<Observable<void>>(payload);
+  return payload.pipe();
+});
+expectType<(payload: void) => void>(fn);
