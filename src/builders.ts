@@ -2,7 +2,7 @@ import produce from 'immer';
 import create from 'zustand';
 import { redux } from 'zustand/middleware';
 import { globalContext, useScopeContext } from './context';
-import { __buildScopeSymbol } from './types';
+import { MethodBuilderFn, __buildScopeSymbol } from './types';
 import { simpleMemoizedFn } from './utils';
 
 import type { EqualityChecker, StateCreator, StateSelector } from 'zustand';
@@ -25,8 +25,23 @@ export function extendComputed(computed: ComputedRecord, rawModule: RawModule): 
   return { ...rawModule, computed };
 }
 
-export function extendMethods<State extends StateRecord, Actions extends ActionsRecord<State>>(builder: MethodBuilder<State, Actions>, rawModule: RawModule): RawModule {
-  return { ...rawModule, methodsBuilders: [...rawModule.methodsBuilders, builder] };
+// Support two ways of methods definition: this type & function type
+export function extendMethods<State extends StateRecord, Actions extends ActionsRecord<State>>(
+  builder: MethodBuilderFn<State, Actions> | MethodBuilder,
+  rawModule: RawModule
+): RawModule {
+  const builderFn =
+    typeof builder === 'function'
+      ? builder
+      : (perform: Perform<State, Actions>) =>
+          Object.keys(builder).reduce((acc, cur) => {
+            acc[cur] = builder[cur].bind(perform);
+            return acc;
+          }, {} as Record<string, (...args: any) => any>);
+  return {
+    ...rawModule,
+    methodsBuilders: [...rawModule.methodsBuilders, builderFn],
+  };
 }
 
 export function extendMiddleware<State extends StateRecord>(middleware: MiddlewareBuilder<State>, rawModule: RawModule<State>): RawModule<State> {

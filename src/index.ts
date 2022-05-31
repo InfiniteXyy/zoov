@@ -1,13 +1,13 @@
 import { EqualityChecker, StateSelector } from 'zustand';
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
 import { defineProvider, useScopeContext } from './context';
-import type { ActionsRecord, ComputedRecord, HooksModule, ModuleFactory, RawModule, StateRecord } from './types';
+import type { ActionsRecord, ComputedRecord, HooksModule, MethodBuilder, MethodBuilderFn, ModuleFactory, RawModule, StateRecord } from './types';
 
 function factory<State extends StateRecord>(state: State, rawModule: RawModule<any, any>): ModuleFactory<State, any, any> {
   return {
     actions: (actions) => factory(state, extendActions(actions, rawModule)),
     computed: (computed) => factory(state, extendComputed(computed, rawModule)),
-    methods: (methods) => factory(state, extendMethods(methods, rawModule)),
+    methods: (methods: MethodBuilderFn<State, any> | MethodBuilder) => factory(state, extendMethods(methods, rawModule)),
     middleware: (middleware) => factory(state, extendMiddleware(middleware, rawModule)),
     build: buildModule(state, rawModule),
   };
@@ -43,4 +43,4 @@ function useModuleComputed<State extends StateRecord, Actions extends ActionsRec
 
 export { defineModule, defineProvider, useScopeContext, useModule, useModuleActions, useModuleComputed };
 
-export const VERSION = '0.3.3';
+export const VERSION = '0.3.4';

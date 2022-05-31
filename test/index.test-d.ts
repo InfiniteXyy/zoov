@@ -33,6 +33,11 @@ const module = defineModule<ModuleState>({ count: 0 })
       self.getActions().add(count);
     },
   }))
+  .methods({
+    example() {
+      expectType<{ getActions: () => ModuleActions; getState: () => ModuleState }>(this);
+    },
+  })
   .middleware((store) => {
     expectType<StateCreator<ModuleState, any, any, any>>(store);
     return store;
@@ -75,7 +80,7 @@ expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useTrac
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useModule(module));
 
 // effect
-const fn = effect<void>((payload) => {
+const fn = effect((payload) => {
   expectType<Observable<void>>(payload);
   return payload.pipe();
 });

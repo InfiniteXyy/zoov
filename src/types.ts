@@ -22,14 +22,15 @@ export type Perform<State extends StateRecord, Actions extends ActionsRecord<Sta
 /* Core Types */
 export type ActionBuilder<State extends StateRecord> = Record<string, (draft: Draft<State>, ...args: any) => void>;
 export type ComputedBuilder<State extends StateRecord> = Record<string, (state: State) => any>;
-export type MethodBuilder<State extends StateRecord, Actions extends ActionsRecord<State>> = (perform: Perform<State, Actions>) => Record<any, (...args: any) => any>;
+export type MethodBuilderFn<State extends StateRecord, Actions extends ActionsRecord<State>> = (perform: Perform<State, Actions>) => Record<any, (...args: any) => any>;
+export type MethodBuilder = Record<any, (...args: any) => any>;
 export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State, any, any, any>) => StateCreator<State, any, any, any>;
 
 export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>> = {
   computed: Record<string, (state: State) => any>;
   // "reducers" and "methodsBuilders" will be turned into actions
   reducers: Record<string, Reducer<State>>;
-  methodsBuilders: MethodBuilder<State, Actions>[];
+  methodsBuilders: MethodBuilderFn<State, Actions>[];
   middlewares: MiddlewareBuilder<State>[];
 };
 
@@ -41,7 +42,8 @@ export type ModuleFactory<
 > = {
   actions<A extends ActionBuilder<State>>(actions: A): Omit<ModuleFactory<State, GenAction<A> & Actions, Computed, Excluded | 'actions'>, Excluded | 'actions'>;
   computed<C extends ComputedBuilder<State>>(computed: C): Omit<ModuleFactory<State, Actions, GenComputed<C>, Excluded | 'computed'>, Excluded | 'computed'>;
-  methods<MB extends MethodBuilder<State, Actions>>(builder: MB): ModuleFactory<State, ReturnType<MB> & Actions, Computed, Excluded>;
+  methods<ME extends Record<any, (...args: any) => any>>(methods: ThisType<Perform<State, Actions>> & ME): ModuleFactory<State, ME & Actions, Computed, Excluded>;
+  methods<MB extends MethodBuilderFn<State, Actions>>(builder: MB): ModuleFactory<State, ReturnType<MB> & Actions, Computed, Excluded>;
   middleware<M extends MiddlewareBuilder<State>>(middleware: M): Omit<ModuleFactory<State, Actions, Computed, Excluded | 'middleware'>, Excluded | 'middleware'>;
   build(): HooksModule<State, Actions, Computed>;
 };

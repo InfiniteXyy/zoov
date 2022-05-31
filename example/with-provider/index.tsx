@@ -15,12 +15,12 @@ const counterModule = defineModule({ count: 0 })
     },
     reset: (draft) => (draft.count = 0),
   })
-  .methods(({ getActions }) => ({
-    addOne: () => {
-      getActions().add(1);
-      getActions(logModule).log('perform addOne');
+  .methods({
+    addOne() {
+      this.getActions().add(1);
+      this.getActions(logModule).log('perform addOne');
     },
-  }))
+  })
   .build();
 
 const LogProvider = defineProvider((handle) => {

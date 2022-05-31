@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/index.js",
@@ -51,7 +51,7 @@
     "build": "rimraf ./dist && rollup -c rollup.config.ts",
     "prepare": "npm run build",
     "test": "npm run test:types && vitest run --coverage",
-    "test:types": "tsc && tsd",
+    "test:types": "tsc -p ./tsconfig.build.json && tsd",
     "example": "cd example && vite",
     "taze": "taze -w major"
   },

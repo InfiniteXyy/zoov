@@ -131,31 +131,66 @@ describe('test hooks', function () {
     expect(spy).toHaveBeenCalledTimes(1); // only the first time
   });
 
-  it('should methods works', async function () {
-    const module = defineModule({ count: 2 })
-      .actions({
-        add: (draft, value: number) => (draft.count += value),
-        reset: (draft) => (draft.count = 2),
-      })
-      .methods(({ getActions, getState }) => ({
-        multBy: (times: number) => {
-          getActions().add(getState().count * (times - 1));
-        },
-      }))
-      .methods(({ getActions }) => ({
-        lazyMultBy: async (times: number, timeout: number) => {
-          await new Promise((resolve) => setTimeout(resolve, timeout));
-          getActions().multBy(times);
-        },
-        effectMultBy: effect<number>((payload$) =>
-          payload$.pipe(
-            throttleTime(30),
-            map((times) => getActions().multBy(times))
-          )
-        ),
-      }))
-      .build();
-
+  it.each([
+    {
+      name: 'Functional Style',
+      factory: () =>
+        defineModule({ count: 2 })
+          .actions({
+            add: (draft, value: number) => (draft.count += value),
+            reset: (draft) => (draft.count = 2),
+          })
+          .methods(({ getActions, getState }) => ({
+            multBy: (times: number) => {
+              getActions().add(getState().count * (times - 1));
+            },
+          }))
+          .methods(({ getActions }) => ({
+            lazyMultBy: async (times: number, timeout: number) => {
+              await new Promise((resolve) => setTimeout(resolve, timeout));
+              getActions().multBy(times);
+            },
+            effectMultBy: effect<number>((payload$) =>
+              payload$.pipe(
+                throttleTime(30),
+                map((times) => getActions().multBy(times))
+              )
+            ),
+          }))
+          .build(),
+    },
+    {
+      name: 'Object `this` style',
+      factory: () =>
+        defineModule({ count: 2 })
+          .actions({
+            add: (draft, value: number) => (draft.count += value),
+            reset: (draft) => (draft.count = 2),
+          })
+          .methods({
+            multBy(times: number) {
+              this.getActions().add(this.getState().count * (times - 1));
+            },
+          })
+          .methods({
+            async lazyMultBy(times: number, timeout: number) {
+              await new Promise((resolve) => setTimeout(resolve, timeout));
+              this.getActions().multBy(times);
+            },
+          })
+          .methods(({ getActions }) => ({
+            // currently, effect is not supported for `this` style
+            effectMultBy: effect(function (payload$) {
+              return payload$.pipe(
+                throttleTime(30),
+                map((times) => getActions().multBy(times))
+              );
+            }),
+          }))
+          .build(),
+    },
+  ])('should methods with $name works', async function ({ factory }) {
+    const module = factory();
     const { result } = renderHook(() => {
       const [{ count }, actions] = module.use();
       return { count, ...actions };
@@ -174,6 +209,18 @@ describe('test hooks', function () {
       result.current.effectMultBy(3);
     });
     expect(result.current.count).toBe(6);
+  });
+
+  it('should methods throw error when getActions in methods', () => {
+    expect(() => {
+      defineModule({})
+        .methods(({ getActions }) => {
+          const { setState } = getActions();
+          return { a: () => setState('') };
+        })
+        .build()
+        .getActions();
+    }).toThrowError(/getActions/);
   });
 
   it('should middleware works', function () {

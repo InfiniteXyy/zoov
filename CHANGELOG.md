@@ -1,3 +1,7 @@
+## 0.3.4
+- chore: add error msg for using getActions in methods builder function
+- feat: support new object style methods builder, with support of `this`.
+
 ## 0.3.3
 - feat: `computed` now will only be triggered when it's deps updated (based on react-tracked).
 - feat: add `useModule` & `useModuleActions` shortcut hooks

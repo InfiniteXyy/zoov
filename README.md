@@ -5,7 +5,7 @@
 <a href="https://codecov.io/gh/infinitexyy/zoov"><img src="https://img.shields.io/codecov/c/github/infinitexyy/zoov.svg" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
-<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.3.3" alt="minzip"></a>
+<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.3.4" alt="minzip"></a>
 </p>
 <p align="center">
 <a href="https://zoov.xyynext.xyz">React the docs</a>
@@ -15,7 +15,7 @@
 
 - 😌 Easy: Comfortable type inference
 - ✨ Magic: Update state by just mutate it (with support of immer)
-- 🍳 Tiny: 160 line code based on Zustand
+- 🍳 Tiny: < 200 line code based on Zustand
 - 🧮 Powerful: Modular state management (Redux-like)
 - 📖 Smart: Scope supported with Algebraic Effects
 - 📦 Flexible: Attach state/actions inside or outside React
@@ -89,6 +89,13 @@ const counterModule = defineModule({ count: 0 })
         )
       ),
     };
+  })
+  // using `this` is allow allowed, remember to set `noImplicitThis` true in tsconfig
+  .methods({
+    addTwo() {
+      this.getActions().add();
+      this.getActions().add();
+    },
   })
   .build();
 ```
