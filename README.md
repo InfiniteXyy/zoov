@@ -90,7 +90,7 @@ const counterModule = defineModule({ count: 0 })
       ),
     };
   })
-  // using `this` is allow allowed, remember to set `noImplicitThis` true in tsconfig
+  // using `this` is allowed now! remember to set `noImplicitThis` true in tsconfig
   .methods({
     addTwo() {
       this.getActions().add();
