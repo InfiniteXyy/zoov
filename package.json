@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.3.4",
+  "version": "0.3.6",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/index.js",
@@ -92,7 +92,7 @@
     "react": ">=16.8.0",
     "react-tracked": ">=1.0.0",
     "rxjs": ">=7.0.0",
-    "zustand": ">=3.0.0"
+    "zustand": ">=3 || >= 4.0.0-rc"
   },
   "peerDependenciesMeta": {
     "rxjs": {
