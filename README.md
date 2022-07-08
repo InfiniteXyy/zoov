@@ -22,7 +22,7 @@
 
 ## Quick Start
 
-You can try it on [StackBlitz](https://stackblitz.com/edit/vitejs-vite-mgdqal) or [CodeSandbox](https://codesandbox.io/s/zoov-example-8ggez)
+You can try it on [StackBlitz](https://stackblitz.com/edit/vitejs-vite-mgdqal) or [CodeSandbox](https://codesandbox.io/s/zoov-example-9q0eb5)
 
 Or install locally
 
