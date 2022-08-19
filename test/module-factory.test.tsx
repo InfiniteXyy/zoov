@@ -1,9 +1,14 @@
 import { renderHook, act, cleanup } from '@testing-library/react';
 import { describe, it, expect, afterEach } from 'vitest';
-import { defineModule } from '../src';
+import { defineModule, VERSION } from '../src';
+import packageJson from '../package.json';
 
 describe('test module factory', function () {
   afterEach(cleanup);
+
+  it('should export version be correct', function () {
+    expect(VERSION).toBe(packageJson.version);
+  });
 
   it('should factory builder methods be pure function', function () {
     const factory1 = defineModule({ state: 0 });

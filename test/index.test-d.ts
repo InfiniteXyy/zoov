@@ -79,6 +79,8 @@ expectType<ModuleComputed>(useModuleComputed(module));
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(module.use());
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useTrackedModule(module));
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useModule(module));
+// @ts-expect-error
+module.useActions().setState();
 
 // effect
 const fn = effect((payload) => {

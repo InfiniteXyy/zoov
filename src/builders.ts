@@ -10,14 +10,14 @@ import type { ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext,
 import type { Perform, ScopeBuildOption, MethodBuilder, MiddlewareBuilder, Action, ActionsRecord } from './types';
 
 export function extendActions<State extends StateRecord, Actions extends ActionsRecord<State>>(
-  rawActions: Actions,
+  rawActions: Actions & Record<string, Action>,
   rawModule: RawModule<State, Actions>
 ): RawModule<State, Actions> {
-  const reducerKeys: (keyof Actions)[] = Object.keys(rawActions);
+  const reducerKeys: string[] = Object.keys(rawActions);
   const reducers = reducerKeys.reduce((acc, key) => {
     acc[key] = (...args: unknown[]) => produce((draft) => void rawActions[key](draft, ...args));
     return acc;
-  }, {} as Record<keyof Actions, Reducer<State>>);
+  }, {} as Record<string, Reducer<State>>);
   return { ...rawModule, reducers };
 }
 
@@ -82,7 +82,7 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
           if (cachedAction) return cachedAction as Actions & ActionsRecord<State>;
 
           // build actions
-          let actions = {} as Actions & ActionsRecord<State>;
+          let actions = {} as Actions;
 
           // the default $reset function
           actions.$reset = () => {
@@ -111,8 +111,8 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
 
           // bind Actions with dispatch, build methods
           const dispatch = self.store.getState().dispatch as (payload: { type: keyof ActionsRecord<State>; payload: any }) => void;
-          Object.keys(rawModule.reducers).forEach((key: keyof Actions & string) => {
-            actions[key] = ((...args: any) => dispatch({ type: key, payload: args })) as Actions[typeof key];
+          Object.keys(rawModule.reducers).forEach((key: any) => {
+            (actions as Record<string, (...args: any) => unknown>)[key] = (...args: any) => dispatch({ type: key, payload: args });
           });
           const getScope = (module?: HooksModule<any, any>): Scope<any, any> => {
             if (!module) return self;

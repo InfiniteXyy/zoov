@@ -11,7 +11,7 @@ type GenComputed<RawComputed> = RawComputed extends Record<string, (...args: any
 export type StateRecord = Record<string, any>;
 export type Reducer<State> = (...args: any) => (state: State) => State;
 export type Action = (...args: any) => void;
-export type ActionsRecord<State> = Record<string, Action> & { $setState: SetState<State>; $reset: () => void };
+export type ActionsRecord<State> = { $setState: SetState<State>; $reset: () => void };
 export type ComputedRecord = Record<string, any>;
 
 export type Perform<State extends StateRecord, Actions extends ActionsRecord<State>> = {
