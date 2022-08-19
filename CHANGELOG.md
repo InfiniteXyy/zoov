@@ -1,3 +1,8 @@
+## 0.4.0
+
+- breaking-changes: rename `action.setState` to `action.$setState`
+- feat: add `$reset` to reset state to default value
+
 ## 0.3.5, 0.3.6
 
 - fix: update peer dependency semver define, fix npm install issue

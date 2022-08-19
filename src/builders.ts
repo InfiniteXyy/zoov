@@ -57,7 +57,7 @@ function getScopeOrBuild<State extends StateRecord, Actions extends ActionsRecor
   return (scopeRef.current ??= (module as any)[__buildScopeSymbol](scopeRef.buildOption));
 }
 
-export function buildModule<State extends StateRecord, Actions extends ActionsRecord<State>>(state: State, rawModule: RawModule<State, Actions & ActionsRecord<State>>) {
+export function buildModule<State extends StateRecord, Actions extends ActionsRecord<State>>(initialState: State, rawModule: RawModule<State, Actions & ActionsRecord<State>>) {
   return (): HooksModule<State, Actions> => {
     const buildScope = (props?: ScopeBuildOption<State>): Scope<State, Actions> => {
       // this function keeps all essential module data within the closure
@@ -68,7 +68,7 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
       type ScopeReducer<State extends StateRecord> = (state: State, action: { type: string; payload: unknown[] }) => State;
 
       const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
-      const stateCreator: StateCreator<any, any, any> = redux(scopeReducer, { ...state, ...defaultValue });
+      const stateCreator: StateCreator<any, any, any> = redux(scopeReducer, { ...initialState, ...defaultValue });
       const middlewares = middleware ? [middleware] : rawModule.middlewares;
 
       const computed: ComputedRecord = {};
@@ -84,8 +84,13 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
           // build actions
           let actions = {} as Actions & ActionsRecord<State>;
 
-          // the default setState function
-          actions.setState = (...args: any[]) => {
+          // the default $reset function
+          actions.$reset = () => {
+            self.store.setState({ ...initialState, ...defaultValue });
+          };
+
+          // the default $setState function
+          actions.$setState = (...args: any[]) => {
             const newState = produce((draft) => {
               const getters = args.slice(0, args.length - 1);
               const setter = args[args.length - 1];
@@ -117,7 +122,7 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
           const perform: Perform<State, Actions & ActionsRecord<State>> = {
             getState: (module?: HooksModule) => getScope(module).getState(),
             getActions: (module?: HooksModule) => {
-              if (isBuildingMethods) throw new Error('should not call getActions in a builder function, getActions in a methods instead');
+              if (isBuildingMethods) throw new Error('should not call getActions in the method builder, call it inside a method.');
               return getScope(module).getActions(context);
             },
           };

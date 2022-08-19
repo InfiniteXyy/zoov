@@ -16,9 +16,9 @@ describe('test tracked-module', function () {
       return { count, actions, doubled };
     });
     expect(spy).toBeCalledTimes(1);
-    act(() => result.current.actions.setState('input', (i) => i + '1'));
+    act(() => result.current.actions.$setState('input', (i) => i + '1'));
     expect(spy).toBeCalledTimes(1);
-    act(() => result.current.actions.setState('count', (i) => i + 1));
+    act(() => result.current.actions.$setState('count', (i) => i + 1));
     expect(spy).toBeCalledTimes(2);
     expect(result.current.doubled).toBe(2);
   });

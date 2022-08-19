@@ -5,7 +5,7 @@ import { defineModule, useModule, useModuleActions, useModuleComputed } from '..
 import { Observable } from 'rxjs';
 import { effect } from '../src/effect';
 import { useTrackedModule } from '../src/tracked';
-import { ActionsRecord, __buildScopeSymbol } from '../src/types';
+import { ActionsRecord, SetState, __buildScopeSymbol } from '../src/types';
 
 type ModuleState = { count: number };
 type ModuleComputed = { doubled: number };
@@ -86,3 +86,7 @@ const fn = effect((payload) => {
   return payload.pipe();
 });
 expectType<(payload: void) => void>(fn);
+
+// internal actions
+expectType<() => void>(module.useActions().$reset);
+expectType<SetState<ModuleState>>(module.useActions().$setState);

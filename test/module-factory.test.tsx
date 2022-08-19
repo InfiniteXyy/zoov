@@ -17,11 +17,11 @@ describe('test module factory', function () {
     const module3 = factory3.build();
     {
       const { result } = renderHook(() => module2.useActions());
-      expect(Object.keys(result.current)).toHaveLength(1); // setState
+      expect(Object.keys(result.current)).toHaveLength(2); // $setState + $reset
     }
     {
       const { result } = renderHook(() => module3.useActions());
-      expect(Object.keys(result.current)).toHaveLength(2); // setState + hello
+      expect(Object.keys(result.current)).toHaveLength(3); // $setState + $reset + hello
     }
   });
 });

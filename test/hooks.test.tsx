@@ -1,6 +1,6 @@
-import { act, renderHook, cleanup } from '@testing-library/react';
+import { act, renderHook, cleanup, render } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { defineModule, useModule, useModuleActions, useModuleComputed } from '../src';
+import { defineModule, defineProvider, useModule, useModuleActions, useModuleComputed } from '../src';
 import { effect } from '../src/effect';
 import { map, throttleTime } from 'rxjs/operators';
 import { MiddlewareBuilder } from '../src/types';
@@ -126,7 +126,7 @@ describe('test hooks', function () {
       return doubled;
     });
     act(() => {
-      module.getActions().setState('input', '123');
+      module.getActions().$setState('input', '123');
     });
     expect(spy).toHaveBeenCalledTimes(1); // only the first time
   });
@@ -211,16 +211,16 @@ describe('test hooks', function () {
     expect(result.current.count).toBe(6);
   });
 
-  it('should methods throw error when getActions in methods', () => {
+  it('should throw error when call getActions in methods', () => {
     expect(() => {
       defineModule({})
         .methods(({ getActions }) => {
-          const { setState } = getActions();
-          return { a: () => setState('') };
+          const { $setState } = getActions();
+          return { a: () => $setState('') };
         })
         .build()
         .getActions();
-    }).toThrowError(/getActions/);
+    }).toThrowError('should not call getActions in the method builder, call it inside a method.');
   });
 
   it('should middleware works', function () {
@@ -257,7 +257,7 @@ describe('test hooks', function () {
     expect(spy).toBeCalledTimes(2);
   });
 
-  it('should setState action works', () => {
+  it('should $setState action works', () => {
     const module = defineModule({ deep: { name: 'xyy', age: 12 }, checked: false })
       .actions({
         hello: () => {},
@@ -265,20 +265,60 @@ describe('test hooks', function () {
       .build();
 
     const { result } = renderHook(() => {
-      const { setState, hello } = module.useActions();
+      const { $setState, hello } = module.useActions();
       const state = module.useState();
-      return { setState, state, hello };
+      return { $setState, state, hello };
     });
 
-    act(() => void result.current.setState('checked', true));
+    act(() => void result.current.$setState('checked', true));
     expect(result.current.state.checked).toBe(true);
 
-    act(() => void result.current.setState('deep', 'age', (age) => age + 1));
+    act(() => void result.current.$setState('deep', 'age', (age) => age + 1));
     expect(result.current.state.deep.age).toBe(13);
 
-    act(() => void result.current.setState('deep', 'age', (age) => age + 1));
+    act(() => void result.current.$setState('deep', 'age', (age) => age + 1));
     expect(result.current.state.deep.age).toBe(14);
   });
+});
+
+it('should $reset action works', () => {
+  const INITIAL_STATE = { deep: { name: 'xyy', age: 12 }, checked: false };
+  const module = defineModule(INITIAL_STATE).build();
+
+  const { result } = renderHook(() => {
+    const { $setState, $reset } = module.useActions();
+    const state = module.useState();
+    return { $setState, $reset, state };
+  });
+
+  act(() => void result.current.$setState('checked', true));
+  expect(result.current.state.checked).toBe(true);
+  act(() => void result.current.$setState('deep', 'age', (age) => age + 1));
+  expect(result.current.state.deep.age).toBe(13);
+  act(() => void result.current.$reset());
+  expect(result.current.state).toStrictEqual(expect.objectContaining(INITIAL_STATE));
+});
+
+it('should $reset action works in provider', () => {
+  const INITIAL_STATE = { deep: { name: 'xyy', age: 12 }, checked: false };
+  const module = defineModule(INITIAL_STATE).build();
+
+  const Provider = defineProvider((handle) => {
+    handle(module, { defaultValue: { deep: { age: 99, name: 'yzz' } } });
+  });
+  const { result } = renderHook(
+    () => {
+      const { $setState, $reset } = module.useActions();
+      const state = module.useState();
+      return { $setState, $reset, state };
+    },
+    { wrapper: Provider }
+  );
+
+  act(() => void result.current.$setState('checked', true));
+  expect(result.current.state.checked).toBe(true);
+  act(() => void result.current.$reset());
+  expect(result.current.state).toStrictEqual(expect.objectContaining({ deep: { age: 99, name: 'yzz' }, checked: false }));
 });
 
 describe('test shortcut hooks', () => {
