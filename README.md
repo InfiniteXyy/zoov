@@ -8,7 +8,7 @@
 <a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.4.0" alt="minzip"></a>
 </p>
 <p align="center">
-<a href="https://zoov.xyynext.xyz">React the docs</a>
+<a href="https://zoov.xyynext.xyz">Read the docs</a>
 </p>
 
 ## Features
