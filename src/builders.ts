@@ -109,6 +109,12 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
             self.store.setState(newState);
           };
 
+          (actions as any).setState = (...args: any[]) => {
+            console.error('setState will be removed, use $setState instead');
+            // @ts-ignore
+            actions.$setState(...args);
+          };
+
           // bind Actions with dispatch, build methods
           const dispatch = self.store.getState().dispatch as (payload: { type: keyof ActionsRecord<State>; payload: any }) => void;
           Object.keys(rawModule.reducers).forEach((key: any) => {

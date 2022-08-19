@@ -281,6 +281,18 @@ describe('test hooks', function () {
   });
 });
 
+it('should setState log deprecated message', () => {
+  const module = defineModule({ deep: { name: 'xyy', age: 12 }, checked: false }).build();
+  const { result } = renderHook(() => {
+    const { setState } = module.useActions() as any;
+    return { setState, state: module.useState() };
+  });
+  const errorFn = vi.spyOn(console, 'error');
+  act(() => void result.current.setState('checked', true));
+  expect(result.current.state.checked).toBe(true);
+  expect(errorFn).toHaveBeenCalledWith('setState will be removed, use $setState instead');
+});
+
 it('should $reset action works', () => {
   const INITIAL_STATE = { deep: { name: 'xyy', age: 12 }, checked: false };
   const module = defineModule(INITIAL_STATE).build();

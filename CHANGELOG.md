@@ -1,7 +1,11 @@
+## 0.4.1
+- feat: make `action.setState` fallback to `$setState`, but it's deprecated, will be removed in next version
+
 ## 0.4.0
 
 - breaking-changes: rename `action.setState` to `action.$setState`
 - feat: add `$reset` to reset state to default value
+- feat: stricter type checking with actions
 
 ## 0.3.5, 0.3.6
 
