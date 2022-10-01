@@ -1,7 +1,6 @@
-import { EqualityChecker, StateSelector } from 'zustand';
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
 import { defineProvider, useScopeContext } from './context';
-import type { ActionsRecord, ComputedRecord, HooksModule, MethodBuilder, MethodBuilderFn, ModuleFactory, RawModule, StateRecord } from './types';
+import type { ActionsRecord, ComputedRecord, HooksModule, MethodBuilder, MethodBuilderFn, ModuleFactory, RawModule, StateRecord, EqualityChecker } from './types';
 
 function factory<State extends StateRecord>(state: State, rawModule: RawModule<any, any>): ModuleFactory<State, any, any> {
   return {
@@ -25,7 +24,7 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
 // Just a shortcut of module.use
 function useModule<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord, StateResult = State>(
   module: HooksModule<State, Actions, Computed>,
-  selector?: StateSelector<State, StateResult>,
+  selector?: (state: State) => StateResult,
   equalityFn?: EqualityChecker<StateResult>
 ): [StateResult, Actions, Computed] {
   return module.use(selector, equalityFn);

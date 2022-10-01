@@ -5,8 +5,8 @@ import { globalContext, useScopeContext } from './context';
 import { MethodBuilderFn, __buildScopeSymbol } from './types';
 import { simpleMemoizedFn } from './utils';
 
-import type { EqualityChecker, StateCreator, StateSelector } from 'zustand';
-import type { ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext, Scope, Reducer } from './types';
+import type { StateCreator } from 'zustand';
+import type { EqualityChecker, ComputedRecord, StateRecord, HooksModule, RawModule, ScopeContext, Scope, Reducer } from './types';
 import type { Perform, ScopeBuildOption, MethodBuilder, MiddlewareBuilder, Action, ActionsRecord } from './types';
 
 export function extendActions<State extends StateRecord, Actions extends ActionsRecord<State>>(
@@ -160,8 +160,8 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
     };
 
     const module = {
-      use: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => [module.useState(selector, equalFn), module.useActions(), module.useComputed()],
-      useState: (selector: StateSelector<State, unknown>, equalFn: EqualityChecker<unknown>) => useScope().store(selector, equalFn),
+      use: (selector: (state: State) => unknown, equalFn: EqualityChecker<unknown>) => [module.useState(selector, equalFn), module.useActions(), module.useComputed()],
+      useState: (selector: (state: State) => unknown, equalFn: EqualityChecker<unknown>) => useScope().store(selector, equalFn),
       useActions: () => useScope().getActions(useScopeContext()),
       useComputed: () => useScope().getComputed(),
       getState: (context = globalContext) => getScopeOrBuild(context, module).getState(),

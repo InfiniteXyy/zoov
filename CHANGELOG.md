@@ -1,4 +1,9 @@
 ## 0.4.1
+
+- chore: remove deprecated type def, update dependencies
+
+## 0.4.1
+
 - feat: make `action.setState` fallback to `$setState`, but it's deprecated, will be removed in next version
 
 ## 0.4.0

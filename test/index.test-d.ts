@@ -81,6 +81,7 @@ expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useTrac
 expectType<[ModuleState, ModuleActions & ModuleMethods, ModuleComputed]>(useModule(module));
 // @ts-expect-error
 module.useActions().setState();
+module.useActions().$setState('count', 2);
 
 // effect
 const fn = effect((payload) => {

@@ -1,4 +1,4 @@
-import type { StateSelector, StateCreator, EqualityChecker, StoreApi, UseBoundStore } from 'zustand';
+import type { StateCreator, StoreApi, UseBoundStore } from 'zustand';
 import type { Draft } from 'immer';
 
 /* Utility Types */
@@ -8,6 +8,7 @@ type GenAction<RawAction> = RawAction extends Record<string, any> ? { [K in keyo
 type GenComputed<RawComputed> = RawComputed extends Record<string, (...args: any) => unknown> ? { [K in keyof RawComputed]: ReturnType<RawComputed[K]> } : never;
 
 /* Basic Types */
+export type EqualityChecker<T> = (state: T, newState: T) => boolean;
 export type StateRecord = Record<string, any>;
 export type Reducer<State> = (...args: any) => (state: State) => State;
 export type Action = (...args: any) => void;
@@ -57,13 +58,13 @@ export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord<
   getState(): State;
 };
 
-export type ScopeBuildOption<State> = { defaultValue?: Partial<State>; middleware?: MiddlewareBuilder<State> };
+export type ScopeBuildOption<State extends StateRecord = {}> = { defaultValue?: Partial<State>; middleware?: MiddlewareBuilder<State> };
 export type ScopeRef = { current?: Scope<any, any>; buildOption?: ScopeBuildOption<any> };
 export type ScopeContext = Map<HooksModule<any, any, any>, ScopeRef>;
 
 export type HooksModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>, Computed extends ComputedRecord = {}> = {
-  use<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): [SelectorResult, Actions, Computed];
-  useState<SelectorResult = State>(selector?: StateSelector<State, SelectorResult>, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
+  use<SelectorResult = State>(selector?: (state: State) => SelectorResult, equalityFn?: EqualityChecker<SelectorResult>): [SelectorResult, Actions, Computed];
+  useState<SelectorResult = State>(selector?: (state: State) => SelectorResult, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
   useActions(): Actions;
   useComputed(): Computed;
   /** Retrieve state outside React components,
