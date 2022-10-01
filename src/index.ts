@@ -42,4 +42,4 @@ function useModuleComputed<State extends StateRecord, Actions extends ActionsRec
 
 export { defineModule, defineProvider, useScopeContext, useModule, useModuleActions, useModuleComputed };
 
-export const VERSION = '0.4.1';
+export const VERSION = '0.4.2';
