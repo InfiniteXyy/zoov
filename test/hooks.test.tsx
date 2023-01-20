@@ -1,4 +1,4 @@
-import { act, renderHook, cleanup, render } from '@testing-library/react';
+import { act, renderHook, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { defineModule, defineProvider, useModule, useModuleActions, useModuleComputed } from '../src';
 import { effect } from '../src/effect';
@@ -226,17 +226,13 @@ describe('test hooks', function () {
   it('should middleware works', function () {
     const spy = vi.fn();
 
-    const middleware: MiddlewareBuilder<State> = (config) => (set, get, api, mutation) =>
-      config(
-        (args) => {
-          spy(args);
-          set(args);
-        },
-        get,
-        api,
-        mutation
-      );
-
+    const middleware: MiddlewareBuilder<State> = (config) => (set, get, api) => {
+      const setState: typeof set = (args) => {
+        spy(args);
+        set(args);
+      };
+      return config(setState, get, api);
+    };
     const module = emptyModule
       .actions({
         add: (draft, value: number) => (draft.count += value),

@@ -1,3 +1,7 @@
+## 0.4.3
+
+- chore: update dependencies
+
 ## 0.4.2
 
 - chore: remove deprecated type def, update dependencies

@@ -5,7 +5,7 @@
 <a href="https://codecov.io/gh/infinitexyy/zoov"><img src="https://img.shields.io/codecov/c/github/infinitexyy/zoov.svg" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
-<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.4.1" alt="minzip"></a>
+<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.4.3" alt="minzip"></a>
 </p>
 <p align="center">
 <a href="https://zoov.xyynext.xyz">Read the docs</a>
@@ -144,7 +144,7 @@ const { $setState, $reset } = useActions();
 
 $setState('count', 1);
 $setState('nested', 'checked', (v) => !v);
-$reset()
+$reset();
 ```
 
 ### Use Provider

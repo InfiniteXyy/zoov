@@ -1,5 +1,5 @@
 import produce from 'immer';
-import create from 'zustand';
+import { create } from 'zustand';
 import { redux } from 'zustand/middleware';
 import { globalContext, useScopeContext } from './context';
 import { MethodBuilderFn, __buildScopeSymbol } from './types';
