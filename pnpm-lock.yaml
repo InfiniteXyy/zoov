@@ -74,7 +74,7 @@ importers:
       scheduler: ^0.23.0
       typescript: ^4.9.4
       vite: ^4.0.4
-      zoov: workspace:zoov
+      zoov: ^0.5.0
       zustand: 4.3.2
     dependencies:
       immer: 9.0.18
