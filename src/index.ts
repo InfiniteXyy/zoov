@@ -1,5 +1,6 @@
 import { extendActions, extendMethods, extendComputed, buildModule, extendMiddleware } from './builders';
 import { defineProvider, useScopeContext } from './context';
+import { extendSubscribe } from './subscribe';
 import type { ActionsRecord, ComputedRecord, HooksModule, MethodBuilder, MethodBuilderFn, ModuleFactory, RawModule, StateRecord, EqualityChecker } from './types';
 
 function factory<State extends StateRecord>(state: State, rawModule: RawModule<any, any>): ModuleFactory<State, any, any> {
@@ -8,6 +9,7 @@ function factory<State extends StateRecord>(state: State, rawModule: RawModule<a
     computed: (computed) => factory(state, extendComputed(computed, rawModule)),
     methods: (methods: MethodBuilderFn<State, any> | MethodBuilder) => factory(state, extendMethods(methods, rawModule)),
     middleware: (middleware) => factory(state, extendMiddleware(middleware, rawModule)),
+    subscribe: (subscriber) => factory(state, extendSubscribe(subscriber, rawModule)),
     build: buildModule(state, rawModule),
   };
 }
@@ -18,6 +20,7 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
     computed: {},
     methodsBuilders: [],
     middlewares: [],
+    subscriptionBuilders: [],
   });
 }
 
@@ -42,4 +45,4 @@ function useModuleComputed<State extends StateRecord, Actions extends ActionsRec
 
 export { defineModule, defineProvider, useScopeContext, useModule, useModuleActions, useModuleComputed };
 
-export const VERSION = '0.4.3';
+export const VERSION = '0.5.0';

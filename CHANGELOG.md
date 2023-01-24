@@ -1,3 +1,9 @@
+## 0.5.0
+
+- feat: Add `getStore`, `useStore` function to module
+- feat: Add `subscribe` for module
+- chore: Remove deprecated `setState`, prefer `$setState`
+
 ## 0.4.3
 
 - chore: update dependencies

@@ -64,11 +64,12 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
       // it will be called when first used inside a Context
       // if the component was not wrapped in a "Zoov Context", it will use the global one
       const { defaultValue = {}, middleware } = props || {};
+      const mergedState = { ...initialState, ...defaultValue };
 
       type ScopeReducer<State extends StateRecord> = (state: State, action: { type: string; payload: unknown[] }) => State;
 
       const scopeReducer: ScopeReducer<State> = (state, { type, payload }) => rawModule.reducers[type](...payload)(state);
-      const stateCreator: StateCreator<any, any, any> = redux(scopeReducer, { ...initialState, ...defaultValue });
+      const stateCreator: StateCreator<any, any, any> = redux(scopeReducer, mergedState);
       const middlewares = middleware ? [middleware] : rawModule.middlewares;
 
       const computed: ComputedRecord = {};
@@ -86,7 +87,7 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
 
           // the default $reset function
           actions.$reset = () => {
-            self.store.setState({ ...initialState, ...defaultValue });
+            self.store.setState(mergedState);
           };
 
           // the default $setState function
@@ -107,12 +108,6 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
               }
             })(self.store.getState());
             self.store.setState(newState);
-          };
-
-          (actions as any).setState = (...args: any[]) => {
-            console.error('setState will be removed, use $setState instead');
-            // @ts-ignore
-            actions.$setState(...args);
           };
 
           // bind Actions with dispatch, build methods
@@ -151,6 +146,12 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
         });
       });
 
+      // bind Subscription
+      // FIXME: should cleanup subscription when module is destroyed, but currently, modules are not auto destroyed
+      rawModule.subscriptionBuilders.forEach((builder) => {
+        self.store.subscribe(builder(mergedState));
+      });
+
       return self;
     };
 
@@ -164,6 +165,8 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
       useState: (selector: (state: State) => unknown, equalFn: EqualityChecker<unknown>) => useScope().store(selector, equalFn),
       useActions: () => useScope().getActions(useScopeContext()),
       useComputed: () => useScope().getComputed(),
+      useStore: () => useScope().store,
+      getStore: (context = globalContext) => getScopeOrBuild(context, module).store,
       getState: (context = globalContext) => getScopeOrBuild(context, module).getState(),
       getActions: (context = globalContext) => getScopeOrBuild(context, module).getActions(context),
       [__buildScopeSymbol]: buildScope,

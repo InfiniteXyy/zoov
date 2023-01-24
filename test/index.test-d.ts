@@ -43,6 +43,31 @@ const module = defineModule<ModuleState>({ count: 0 })
     expectType<StateCreator<ModuleState, any, any, any>>(store);
     return store;
   })
+  // subscription
+  .subscribe((state) => {
+    expectType<ModuleState>(state);
+  })
+  .subscribe({
+    listener: (state) => {
+      expectType<ModuleState>(state);
+    },
+    equalityFn: (state, newState) => {
+      expectType<ModuleState>(state);
+      expectType<ModuleState>(newState);
+      return false;
+    },
+  })
+  .subscribe({
+    selector: (state) => {
+      expectType<ModuleState>(state);
+      return state.count;
+    },
+    listener: async (state, prevState, { addCleanup }) => {
+      expectType<number>(state);
+      expectType<number>(prevState);
+      expectType<void>(addCleanup(() => {}));
+    },
+  })
   .build();
 
 // state only

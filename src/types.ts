@@ -26,6 +26,17 @@ export type ComputedBuilder<State extends StateRecord> = Record<string, (state: 
 export type MethodBuilderFn<State extends StateRecord, Actions extends ActionsRecord<State>> = (perform: Perform<State, Actions>) => Record<any, (...args: any) => any>;
 export type MethodBuilder = Record<any, (...args: any) => any>;
 export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State, any, any, any>) => StateCreator<State, any, any, any>;
+export type SubscribeListener<T> = (state: T, prevState: T, options: { addCleanup: (cleanup: () => void) => void }) => void | Promise<void>;
+export type SubscribeBuilder<State, T extends unknown> =
+  | {
+      selector?: (state: State) => T;
+      listener: SubscribeListener<T>;
+      /** call listener once the module is built, default is true */
+      fireImmediately?: boolean;
+      /** compare function for selector result, default is Object.is */
+      equalityFn?: EqualityChecker<T>;
+    }
+  | SubscribeListener<T>;
 
 export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>> = {
   computed: Record<string, (state: State) => any>;
@@ -33,6 +44,7 @@ export type RawModule<State extends StateRecord = {}, Actions extends ActionsRec
   reducers: Record<string, Reducer<State>>;
   methodsBuilders: MethodBuilderFn<State, Actions>[];
   middlewares: MiddlewareBuilder<State>[];
+  subscriptionBuilders: ((initialState: State) => (state: State) => void)[];
 };
 
 export type ModuleFactory<
@@ -46,6 +58,7 @@ export type ModuleFactory<
   methods<ME extends Record<any, (...args: any) => any>>(methods: ThisType<Perform<State, Actions>> & ME): ModuleFactory<State, ME & Actions, Computed, Excluded>;
   methods<MB extends MethodBuilderFn<State, Actions>>(builder: MB): ModuleFactory<State, ReturnType<MB> & Actions, Computed, Excluded>;
   middleware<M extends MiddlewareBuilder<State>>(middleware: M): Omit<ModuleFactory<State, Actions, Computed, Excluded | 'middleware'>, Excluded | 'middleware'>;
+  subscribe<T = State>(subscriber: SubscribeBuilder<State, T>): ModuleFactory<State, Actions, Computed, Excluded>;
   build(): HooksModule<State, Actions, Computed>;
 };
 
@@ -67,6 +80,10 @@ export type HooksModule<State extends StateRecord = {}, Actions extends ActionsR
   useState<SelectorResult = State>(selector?: (state: State) => SelectorResult, equalityFn?: EqualityChecker<SelectorResult>): SelectorResult;
   useActions(): Actions;
   useComputed(): Computed;
+  /** return zustand store in current scope */
+  useStore(): UseBoundStore<StoreApi<State>>;
+  /** get zustand store, can parse scope with `useScopeContext()` */
+  getStore(scope?: ScopeContext): UseBoundStore<StoreApi<State>>;
   /** Retrieve state outside React components,
    *  note: By default, the return value will be the global module state.
    *        If you want to get "scope-inner" state, you must use the scope parameter.

@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { act, cleanup, render, fireEvent } from '@testing-library/react';
+import { act, cleanup, render, fireEvent, renderHook } from '@testing-library/react';
 import { defineModule, defineProvider, useScopeContext } from '../src';
 import { useCallback } from 'react';
 
@@ -115,6 +115,19 @@ describe('test scope context', () => {
     });
     expect(logSpy).toHaveBeenNthCalledWith(1, 'global');
     expect(logSpy).toHaveBeenNthCalledWith(2, 'custom');
+  });
+
+  it('should static getStore and useStore works', () => {
+    const Module = defineModule<State>({ count: 0 })
+      .actions({ setCount: (draft, value) => (draft.count = value) })
+      .build();
+    expect(Module.getStore().getState().count).toBe(0);
+
+    const Provider = defineProvider((handler) => {
+      handler(Module, { defaultValue: { count: 2 } });
+    });
+    const { result } = renderHook(() => Module.useStore().getState(), { wrapper: Provider });
+    expect(result.current.count).toBe(2);
   });
 
   it('should static getState/getActions works', () => {

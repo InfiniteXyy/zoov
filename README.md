@@ -5,7 +5,7 @@
 <a href="https://codecov.io/gh/infinitexyy/zoov"><img src="https://img.shields.io/codecov/c/github/infinitexyy/zoov.svg" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
-<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.4.3" alt="minzip"></a>
+<a href="https://bundlephobia.com/result?p=zoov"><img src="https://badgen.net/bundlephobia/minzip/zoov@0.5.0" alt="minzip"></a>
 </p>
 <p align="center">
 <a href="https://zoov.xyynext.xyz">Read the docs</a>
@@ -122,6 +122,24 @@ Additionally, you can install [react-tracked](https://github.com/dai-shi/react-t
 ```tsx
 // will not rerender unless "count" changes
 const [{ count }, { add }] = useTrackedModule(module);
+```
+
+### Use subscriptions
+
+```typescript
+const module = defineModule({ pokemonIndex: 0, input: '' })
+  .subscribe((state, prevState) => console.log(state)) // subscribe to the whole store
+  .subscribe({
+    selector: (state) => state.pokemonIndex, // only subscribe to some property
+    listener: async ({ pokemonIndex }, prev, { addCleanup }) => {
+      const abortController = new AbortController();
+      const abortSignal = abortController.signal;
+      addCleanup(() => abortController.abort());
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonIndex}`, { signal: abortSignal });
+      console.log(await response.json());
+    },
+  })
+  .build();
 ```
 
 ### Use Middleware
