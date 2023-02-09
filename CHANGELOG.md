@@ -1,3 +1,7 @@
+## 0.5.2
+
+- fix: https://github.com/InfiniteXyy/zoov/issues/6 react-native bundle issue
+
 ## 0.5.0
 
 - feat: Add `getStore`, `useStore` function to module

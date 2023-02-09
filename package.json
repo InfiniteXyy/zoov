@@ -1,10 +1,9 @@
 {
   "name": "zoov",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/esm/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
@@ -90,7 +89,7 @@
     "proxy-compare": "^2.4.0"
   },
   "peerDependencies": {
-    "immer": ">=7.0.0",
+    "immer": ">=9.0.0",
     "react": ">=16.8.0",
     "react-tracked": ">=1.0.0",
     "rxjs": ">=7.0.0",

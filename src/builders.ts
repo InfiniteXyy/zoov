@@ -1,4 +1,4 @@
-import produce from 'immer';
+import { produce } from 'immer';
 import { create } from 'zustand';
 import { redux } from 'zustand/middleware';
 import { globalContext, useScopeContext } from './context';
