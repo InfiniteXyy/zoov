@@ -8,7 +8,7 @@ const createTypesConfig = (input) => {
     input,
     external,
     output: { dir: 'dist' },
-    plugins: [typescript({ tsconfig: './tsconfig.build.json', declaration: true, declarationDir: 'dist' })],
+    plugins: [typescript({ tsconfig: './tsconfig.build.json', declaration: true, declarationDir: 'dist/types' })],
   });
 };
 

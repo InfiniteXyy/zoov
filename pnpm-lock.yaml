@@ -61,6 +61,12 @@ importers:
       vitest: 0.27.2_jsdom@21.0.0
       zustand: 4.3.2_immer@9.0.18+react@18.2.0
 
+  dist:
+    specifiers:
+      proxy-compare: ^2.4.0
+    dependencies:
+      proxy-compare: 2.4.0
+
   example:
     specifiers:
       '@types/react': ^18.0.27
@@ -82,7 +88,7 @@ importers:
       react-dom: 18.2.0_react@18.2.0
       react-tracked: 1.7.11_2szjah6qrhd6fr2kgr64p4pjgm
       rxjs: 7.8.0
-      zoov: link:..
+      zoov: link:../dist
       zustand: 4.3.2_immer@9.0.18+react@18.2.0
     devDependencies:
       '@types/react': 18.0.27

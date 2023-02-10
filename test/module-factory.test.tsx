@@ -1,7 +1,7 @@
 import { renderHook, act, cleanup } from '@testing-library/react';
 import { describe, it, expect, afterEach } from 'vitest';
 import { defineModule, VERSION } from '../src';
-import packageJson from '../package.json';
+import packageJson from '../npm/package.json';
 
 describe('test module factory', function () {
   afterEach(cleanup);

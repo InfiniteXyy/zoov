@@ -1,0 +1,62 @@
+{
+  "name": "zoov",
+  "version": "0.5.3",
+  "author": "InfiniteXyy",
+  "license": "MIT",
+  "main": "index.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.d.ts",
+      "module": "./esm/index.js",
+      "import": "./esm/index.mjs",
+      "default": "./index.js"
+    },
+    "./effect": {
+      "types": "./effect.d.ts",
+      "module": "./esm/effect.js",
+      "import": "./esm/effect.mjs",
+      "default": "./effect.js"
+    },
+    "./tracked": {
+      "types": "./tracked.d.ts",
+      "module": "./esm/tracked.js",
+      "import": "./esm/tracked.mjs",
+      "default": "./tracked.js"
+    }
+  },
+  "homepage": "https://github.com/InfiniteXyy/zoov",
+  "description": "A React modular state-management solution, based on Zustand",
+  "keywords": [
+    "React",
+    "State-management",
+    "Zustand",
+    "Modular"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InfiniteXyy/zoov"
+  },
+  "files": [
+    "**"
+  ],
+  "dependencies": {
+    "proxy-compare": "^2.4.0"
+  },
+  "peerDependencies": {
+    "immer": ">=9.0.0",
+    "react": ">=16.8.0",
+    "react-tracked": ">=1.0.0",
+    "rxjs": ">=7.0.0",
+    "zustand": ">= 4.3"
+  },
+  "peerDependenciesMeta": {
+    "rxjs": {
+      "optional": true
+    },
+    "react-tracked": {
+      "optional": true
+    }
+  }
+}

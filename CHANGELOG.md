@@ -1,6 +1,6 @@
-## 0.5.2
+## 0.5.3
 
-- fix: https://github.com/InfiniteXyy/zoov/issues/6 react-native bundle issue
+- fix: https://github.com/InfiniteXyy/zoov/issues/6 react-native bundle issue, refactor release file structure
 
 ## 0.5.0
 

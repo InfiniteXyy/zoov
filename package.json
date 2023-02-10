@@ -1,56 +1,18 @@
 {
-  "name": "zoov",
-  "version": "0.5.2",
+  "name": "zoov-template",
+  "version": "0.0.0",
   "author": "InfiniteXyy",
+  "private": true,
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "module": "./dist/esm/index.mjs",
-      "import": "./dist/esm/index.js",
-      "default": "./dist/index.js"
-    },
-    "./effect": {
-      "types": "./dist/effect.d.ts",
-      "module": "./dist/esm/effect.mjs",
-      "import": "./dist/esm/effect.js",
-      "default": "./dist/effect.js"
-    },
-    "./tracked": {
-      "types": "./dist/tracked.d.ts",
-      "module": "./dist/esm/tracked.mjs",
-      "import": "./dist/esm/tracked.js",
-      "default": "./dist/tracked.js"
-    }
-  },
-  "homepage": "https://github.com/InfiniteXyy/zoov",
-  "description": "A React modular state-management solution, based on Zustand",
-  "keywords": [
-    "React",
-    "State-management",
-    "Zustand",
-    "Modular"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/InfiniteXyy/zoov"
-  },
-  "files": [
-    "dist",
-    "src",
-    "LICENSE",
-    "README.md",
-    "effect.d.ts",
-    "tracked.d.ts"
-  ],
+  "main": "index.js",
+  "types": "./dist/types/index.d.ts",
   "scripts": {
-    "build": "rimraf ./dist && rollup -c rollup.config.mjs",
+    "build": "rimraf ./dist && rollup -c rollup.config.mjs && npm run copy",
+    "copy": "cp -r ./npm/* ./dist && cp ./LICENSE ./dist/LICENSE && cp ./README.md ./dist/README.md",
     "prepare": "npm run build",
+    "publish": "cd dist && npm publish",
     "test": "npm run test:types && vitest run --coverage",
-    "test:types": "tsc -p ./tsconfig.build.json && tsd",
+    "test:types": "tsd",
     "example": "cd example && vite",
     "taze": "taze -w major"
   },
@@ -94,13 +56,5 @@
     "react-tracked": ">=1.0.0",
     "rxjs": ">=7.0.0",
     "zustand": ">= 4.3"
-  },
-  "peerDependenciesMeta": {
-    "rxjs": {
-      "optional": true
-    },
-    "react-tracked": {
-      "optional": true
-    }
   }
 }
