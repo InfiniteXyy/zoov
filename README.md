@@ -198,7 +198,7 @@ const App = () => {
 ```typescript jsx
 // by default, it will get the state under global scope
 const actions = module.getActions();
-const state = module.getActions();
+const state = module.getState();
 
 // you can specify the scope with params
 const context = useScopeContext();
