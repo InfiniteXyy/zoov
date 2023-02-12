@@ -1,3 +1,8 @@
+## 0.5.4
+
+- fix: readme typo
+- chore: add type inference utility `InferModule`
+
 ## 0.5.3
 
 - fix: https://github.com/InfiniteXyy/zoov/issues/6 react-native bundle issue, refactor release file structure

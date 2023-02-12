@@ -1,7 +1,7 @@
 import type { Draft } from 'immer';
 import type { StateCreator } from 'zustand';
 import { expectType } from 'tsd';
-import { defineModule, useModule, useModuleActions, useModuleComputed } from '../src';
+import { defineModule, InferModule, useModule, useModuleActions, useModuleComputed } from '../src';
 import { Observable } from 'rxjs';
 import { effect } from '../src/effect';
 import { useTrackedModule } from '../src/tracked';
@@ -118,3 +118,8 @@ expectType<(payload: void) => void>(fn);
 // internal actions
 expectType<() => void>(module.useActions().$reset);
 expectType<SetState<ModuleState>>(module.useActions().$setState);
+
+// inference type utility
+expectType<ModuleState>({} as InferModule<typeof module>['state']);
+expectType<ModuleActions & ModuleMethods>({} as InferModule<typeof module>['actions']);
+expectType<ModuleComputed>({} as InferModule<typeof module>['computed']);

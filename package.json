@@ -31,6 +31,7 @@
     "immer": "^9.0.19",
     "jsdom": "^21.1.0",
     "prettier": "^2.8.4",
+    "proxy-compare": "^2.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-tracked": "^1.7.11",
@@ -46,15 +47,5 @@
     "vite": "^4.1.1",
     "vitest": "^0.28.4",
     "zustand": "^4.3.3"
-  },
-  "dependencies": {
-    "proxy-compare": "^2.4.1"
-  },
-  "peerDependencies": {
-    "immer": ">=9.0.0",
-    "react": ">=16.8.0",
-    "react-tracked": ">=1.0.0",
-    "rxjs": ">=7.0.0",
-    "zustand": ">= 4.3"
   }
 }

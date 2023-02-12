@@ -31,8 +31,6 @@ importers:
       vite: ^4.1.1
       vitest: ^0.28.4
       zustand: ^4.3.3
-    dependencies:
-      proxy-compare: 2.4.1
     devDependencies:
       '@redux-devtools/extension': 3.2.5_redux@4.2.1
       '@rollup/plugin-typescript': 11.0.0_fvqkzcb4hs3uargqzossetbx6u
@@ -45,6 +43,7 @@ importers:
       immer: 9.0.19
       jsdom: 21.1.0
       prettier: 2.8.4
+      proxy-compare: 2.4.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-tracked: 1.7.11_2szjah6qrhd6fr2kgr64p4pjgm
@@ -2787,7 +2786,7 @@ packages:
 
   /proxy-compare/2.4.1:
     resolution: {integrity: sha512-xkL1upOHOOW6zSSNUDZ09hqGDO9lq//Sg92KF8YK+YsD/Et1dP8fZql/h6vgbFa/ScIAlttE4WjTD7QPEg1Ssg==}
-    dev: false
+    dev: true
 
   /psl/1.9.0:
     resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}

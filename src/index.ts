@@ -43,6 +43,8 @@ function useModuleComputed<State extends StateRecord, Actions extends ActionsRec
   return module.useComputed();
 }
 
+export type InferModule<M> = M extends { getState(): infer S; getActions(): infer A; useComputed(): infer C } ? { state: S; actions: A; computed: C } : never;
+
 export { defineModule, defineProvider, useScopeContext, useModule, useModuleActions, useModuleComputed };
 
-export const VERSION = '0.5.3';
+export const VERSION = '0.5.4';
