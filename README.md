@@ -8,7 +8,7 @@
 <a href="https://bundlephobia.com/result?p=zoov"><img src="https://img.shields.io/bundlephobia/minzip/zoov" alt="minzip"></a>
 </p>
 <p align="center">
-<a href="https://zoov.xyynext.xyz">Read the docs</a>
+<a href="https://zoov.xyynext.com">Read the docs</a>
 </p>
 
 ## Features
