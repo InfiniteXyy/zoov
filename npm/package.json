@@ -4,25 +4,46 @@
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "index.js",
-  "types": "types/index.d.ts",
+  "types": "index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
+      "require": {
+        "types": "./index.d.ts",
+        "default": "./index.js"
+      },
+      "import": {
+        "types": "./index.d.ts",
+        "default": "./esm/index.mjs"
+      },
       "types": "./index.d.ts",
       "module": "./esm/index.js",
-      "import": "./esm/index.mjs",
       "default": "./index.js"
     },
     "./effect": {
+      "require": {
+        "types": "./effect.d.ts",
+        "default": "./effect.js"
+      },
+      "import": {
+        "types": "./effect.d.ts",
+        "default": "./esm/effect.mjs"
+      },
       "types": "./effect.d.ts",
       "module": "./esm/effect.js",
-      "import": "./esm/effect.mjs",
       "default": "./effect.js"
     },
     "./tracked": {
-      "types": "./tracked.d.ts",
+      "require": {
+        "types": "./tracked.d.ts",
+        "default": "./tracked.js"
+      },
+      "import": {
+        "types": "./tracked.d.ts",
+        "default": "./esm/tracked.mjs"
+      },
+      "types": "./types/tracked.d.ts",
       "module": "./esm/tracked.js",
-      "import": "./esm/tracked.mjs",
       "default": "./tracked.js"
     }
   },
