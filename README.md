@@ -131,7 +131,7 @@ const module = defineModule({ pokemonIndex: 0, input: '' })
   .subscribe((state, prevState) => console.log(state)) // subscribe to the whole store
   .subscribe({
     selector: (state) => state.pokemonIndex, // only subscribe to some property
-    listener: async ({ pokemonIndex }, prev, { addCleanup }) => {
+    listener: async (pokemonIndex, prev, { addCleanup }) => {
       const abortController = new AbortController();
       const abortSignal = abortController.signal;
       addCleanup(() => abortController.abort());
