@@ -1,6 +1,6 @@
 {
   "name": "zoov",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "author": "InfiniteXyy",
   "license": "MIT",
   "main": "index.js",
@@ -42,11 +42,12 @@
         "types": "./tracked.d.ts",
         "default": "./esm/tracked.mjs"
       },
-      "types": "./types/tracked.d.ts",
+      "types": "./tracked.d.ts",
       "module": "./esm/tracked.js",
       "default": "./tracked.js"
     }
   },
+  "sideEffects": false,
   "homepage": "https://github.com/InfiniteXyy/zoov",
   "description": "A React modular state-management solution, based on Zustand",
   "keywords": [

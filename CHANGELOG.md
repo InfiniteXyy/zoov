@@ -1,3 +1,7 @@
+## 0.5.5
+
+- fix: Add `index.d.ts` file, update module resolve setting for `ts5` bundler resolver, Thanks contribution from [black7375](https://github.com/InfiniteXyy/zoov/pull/11#issuecomment-1614037786)
+
 ## 0.5.4
 
 - fix: readme typo

@@ -47,4 +47,4 @@ export type InferModule<M> = M extends { getState(): infer S; getActions(): infe
 
 export { defineModule, defineProvider, useScopeContext, useModule, useModuleActions, useModuleComputed };
 
-export const VERSION = '0.5.4';
+export const VERSION = '0.5.5';
