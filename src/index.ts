@@ -7,7 +7,7 @@ function factory<State extends StateRecord>(state: State, rawModule: RawModule<a
   return {
     actions: (actions) => factory(state, extendActions(actions, rawModule)),
     computed: (computed) => factory(state, extendComputed(computed, rawModule)),
-    methods: (methods: MethodBuilderFn<State, any> | MethodBuilder) => factory(state, extendMethods(methods, rawModule)),
+    methods: (methods: MethodBuilderFn<State, any, any> | MethodBuilder) => factory(state, extendMethods(methods, rawModule)),
     middleware: (middleware) => factory(state, extendMiddleware(middleware, rawModule)),
     subscribe: (subscriber) => factory(state, extendSubscribe(subscriber, rawModule)),
     build: buildModule(state, rawModule),
@@ -47,4 +47,4 @@ export type InferModule<M> = M extends { getState(): infer S; getActions(): infe
 
 export { defineModule, defineProvider, useScopeContext, useModule, useModuleActions, useModuleComputed };
 
-export const VERSION = '0.5.5';
+export const VERSION = '0.5.6';

@@ -83,14 +83,14 @@ describe('test hooks', function () {
   });
 
   it('should computed only be triggered once when state not changed', function () {
-    const spy = vi.fn();
+    const mockHeavyLogic = vi.fn();
     const module = emptyModule
       .actions({
         add: (draft, value: number) => (draft.count += value),
       })
       .computed({
         doubled: (state) => {
-          spy();
+          mockHeavyLogic();
           return state.count * 2;
         },
       })
@@ -106,9 +106,11 @@ describe('test hooks', function () {
       const { doubled } = module.useComputed();
       return { doubled };
     });
-    expect(spy).toBeCalledTimes(1);
+    expect(result.current.doubled).toBe(0);
+    expect(mockHeavyLogic).toBeCalledTimes(1);
     act(() => void result.current.add(2));
-    expect(spy).toBeCalledTimes(2);
+    expect(result.current.doubled).toBe(4);
+    expect(mockHeavyLogic).toBeCalledTimes(2);
   });
 
   it("should computed only be triggered when it's dependency changes", () => {
@@ -129,6 +131,48 @@ describe('test hooks', function () {
       module.getActions().$setState('input', '123');
     });
     expect(spy).toHaveBeenCalledTimes(1); // only the first time
+  });
+
+  it('should computed be available in the method function', () => {
+    const mockHeavyLogic = vi.fn();
+    const mockAddCallback = vi.fn();
+    const module = emptyModule
+      .computed({
+        doubled: (state) => {
+          mockHeavyLogic();
+          return state.count * 2;
+        },
+      })
+      .methods(({ getComputed, getActions }) => ({
+        add1: () => {
+          // test with arrow function
+          getActions().$setState('count', (i) => i + 1);
+          mockAddCallback(getComputed().doubled);
+        },
+      }))
+      .methods({
+        add2() {
+          // test with this
+          this.getActions().$setState('count', (i) => i + 1);
+          mockAddCallback(this.getComputed().doubled);
+        },
+      })
+      .build();
+    const { result } = renderHook(() => {
+      const [, { add1, add2 }, { doubled }] = module.use();
+      return { doubled, add1, add2 };
+    });
+    expect(mockHeavyLogic).toBeCalledTimes(1); // first time render
+
+    act(() => result.current.add1());
+    expect(mockHeavyLogic).toBeCalledTimes(2);
+    expect(mockAddCallback).toHaveBeenLastCalledWith(2);
+
+    act(() => result.current.add2());
+    expect(mockHeavyLogic).toHaveBeenCalledTimes(3);
+    expect(mockAddCallback).toHaveBeenLastCalledWith(4);
+
+    expect(module.getComputed().doubled).toBe(4);
   });
 
   it.each([

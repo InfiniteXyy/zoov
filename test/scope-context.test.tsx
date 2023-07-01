@@ -28,6 +28,9 @@ describe('test scope context', () => {
     .build();
 
   const module = defineModule<State>({ count: 0 })
+    .computed({
+      doubled: (state) => state.count * 2,
+    })
     .actions({
       setCount: (draft, value) => (draft.count = value),
     })
@@ -130,8 +133,11 @@ describe('test scope context', () => {
     expect(result.current.count).toBe(2);
   });
 
-  it('should static getState/getActions works', () => {
+  it('should static getState/getActions/getComputed works', () => {
     const module = defineModule<State>({ count: 0 })
+      .computed({
+        doubled: (state) => state.count * 2,
+      })
       .actions({
         setCount: (draft, value) => (draft.count = value),
       })
@@ -140,9 +146,10 @@ describe('test scope context', () => {
     expect(module.getActions().setCount).toBeTypeOf('function');
     module.getActions().setCount(2);
     expect(module.getState().count).toBe(2);
+    expect(module.getComputed().doubled).toBe(4);
   });
 
-  it('should static getState/getActions works under a scope', () => {
+  it('should static getState/getActions/getComputed works under a scope', () => {
     const Provider = defineProvider((handle) => {
       handle(module, {
         defaultValue: { count: 123 },
@@ -152,6 +159,7 @@ describe('test scope context', () => {
     const Counter = ({ testId }: { testId: string }) => {
       const scope = useScopeContext();
       const { count } = module.useState();
+      const { doubled } = module.useComputed();
 
       const mutateCount = useCallback(() => {
         // inner be 43
@@ -161,9 +169,12 @@ describe('test scope context', () => {
       }, []);
 
       return (
-        <button data-testid={testId} onClick={mutateCount}>
-          {count}
-        </button>
+        <>
+          <button data-testid={testId} onClick={mutateCount}>
+            {count}
+          </button>
+          <div data-testid={`${testId}-doubled`}>{doubled}</div>
+        </>
       );
     };
 
@@ -177,13 +188,19 @@ describe('test scope context', () => {
     );
 
     const outer = container.getByTestId('outer');
+    const outerDoubled = container.getByTestId('outer-doubled');
     const inner = container.getByTestId('inner');
+    const innerDoubled = container.getByTestId('inner-doubled');
     expect(outer.textContent).toBe('0');
+    expect(outerDoubled.textContent).toBe('0');
     expect(inner.textContent).toBe('123');
+    expect(innerDoubled.textContent).toBe('246');
     act(() => {
       fireEvent.click(inner);
     });
     expect(outer.textContent).toBe('996');
+    expect(outerDoubled.textContent).toBe('1992');
     expect(inner.textContent).toBe('43');
+    expect(innerDoubled.textContent).toBe('86');
   });
 });

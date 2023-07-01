@@ -29,6 +29,7 @@ const module = defineModule<ModuleState>({ count: 0 })
     async addAsync(count?: number) {
       expectType<ModuleActions>(self.getActions());
       expectType<ModuleState>(self.getState());
+      expectType<ModuleComputed>(self.getComputed());
       await Promise.resolve();
       self.getActions().add(count);
     },
@@ -37,6 +38,7 @@ const module = defineModule<ModuleState>({ count: 0 })
     methodWithThis(_payload: string) {
       expectType<ModuleActions & Omit<ModuleMethods, 'methodWithThis'>>(this.getActions());
       expectType<ModuleState>(this.getState());
+      expectType<ModuleComputed>(this.getComputed());
     },
   })
   .middleware((store) => {

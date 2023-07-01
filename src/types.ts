@@ -15,15 +15,18 @@ export type Action = (...args: any) => void;
 export type ActionsRecord<State> = { $setState: SetState<State>; $reset: () => void };
 export type ComputedRecord = Record<string, any>;
 
-export type Perform<State extends StateRecord, Actions extends ActionsRecord<State>> = {
+export type Perform<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord> = {
   getActions<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<any, infer A> ? A : never;
   getState<M extends HooksModule<any> = HooksModule<State, Actions>>(module?: M): M extends HooksModule<infer S> ? S : never;
+  getComputed<M extends HooksModule<any> = HooksModule<State, Actions, Computed>>(module?: M): M extends HooksModule<any, any, infer C> ? C : never;
 };
 
 /* Core Types */
 export type ActionBuilder<State extends StateRecord> = Record<string, (draft: Draft<State>, ...args: any) => void>;
 export type ComputedBuilder<State extends StateRecord> = Record<string, (state: State) => any>;
-export type MethodBuilderFn<State extends StateRecord, Actions extends ActionsRecord<State>> = (perform: Perform<State, Actions>) => Record<any, (...args: any) => any>;
+export type MethodBuilderFn<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord> = (
+  perform: Perform<State, Actions, Computed>
+) => Record<any, (...args: any) => any>;
 export type MethodBuilder = Record<any, (...args: any) => any>;
 export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State, any, any, any>) => StateCreator<State, any, any, any>;
 export type SubscribeListener<T> = (state: T, prevState: T, options: { addCleanup: (cleanup: () => void) => void }) => void | Promise<void>;
@@ -38,11 +41,11 @@ export type SubscribeBuilder<State, T extends unknown> =
     }
   | SubscribeListener<T>;
 
-export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>> = {
+export type RawModule<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>, Computed extends ComputedRecord = {}> = {
   computed: Record<string, (state: State) => any>;
   // "reducers" and "methodsBuilders" will be turned into actions
   reducers: Record<string, Reducer<State>>;
-  methodsBuilders: MethodBuilderFn<State, Actions>[];
+  methodsBuilders: MethodBuilderFn<State, Actions, Computed>[];
   middlewares: MiddlewareBuilder<State>[];
   subscriptionBuilders: ((initialState: State) => (state: State) => void)[];
 };
@@ -55,8 +58,8 @@ export type ModuleFactory<
 > = {
   actions<A extends ActionBuilder<State>>(actions: A): Omit<ModuleFactory<State, GenAction<A> & Actions, Computed, Excluded | 'actions'>, Excluded | 'actions'>;
   computed<C extends ComputedBuilder<State>>(computed: C): Omit<ModuleFactory<State, Actions, GenComputed<C>, Excluded | 'computed'>, Excluded | 'computed'>;
-  methods<ME extends Record<any, (...args: any) => any>>(methods: ThisType<Perform<State, Actions>> & ME): ModuleFactory<State, ME & Actions, Computed, Excluded>;
-  methods<MB extends MethodBuilderFn<State, Actions>>(builder: MB): ModuleFactory<State, ReturnType<MB> & Actions, Computed, Excluded>;
+  methods<ME extends Record<any, (...args: any) => any>>(methods: ThisType<Perform<State, Actions, Computed>> & ME): ModuleFactory<State, ME & Actions, Computed, Excluded>;
+  methods<MB extends MethodBuilderFn<State, Actions, Computed>>(builder: MB): ModuleFactory<State, ReturnType<MB> & Actions, Computed, Excluded>;
   middleware<M extends MiddlewareBuilder<State>>(middleware: M): Omit<ModuleFactory<State, Actions, Computed, Excluded | 'middleware'>, Excluded | 'middleware'>;
   subscribe<T = State>(subscriber: SubscribeBuilder<State, T>): ModuleFactory<State, Actions, Computed, Excluded>;
   build(): HooksModule<State, Actions, Computed>;
@@ -67,6 +70,9 @@ export const __buildScopeSymbol = Symbol('buildScope');
 export type Scope<State extends StateRecord = {}, Actions extends ActionsRecord<State> = ActionsRecord<State>, Computed extends ComputedRecord = {}> = {
   store: UseBoundStore<StoreApi<State>>;
   getActions(context: ScopeContext): Actions;
+  /** Computed with subscription to zustand */
+  getComputedHooks(): Computed;
+  /** Computed without subscription */
   getComputed(): Computed;
   getState(): State;
 };
@@ -85,17 +91,26 @@ export type HooksModule<State extends StateRecord = {}, Actions extends ActionsR
   /** get zustand store, can parse scope with `useScopeContext()` */
   getStore(scope?: ScopeContext): UseBoundStore<StoreApi<State>>;
   /** Retrieve state outside React components,
+   *
    *  note: By default, the return value will be the global module state.
    *        If you want to get "scope-inner" state, you must use the scope parameter.
    *        you can get the scope via hooks `useScopeContext()`
    */
   getState(scope?: ScopeContext): State;
   /** Retrieve actions outside React components,
+   *
    *  note: By default, the return value will be the global module state.
    *        If you want to get "scope-inner" actions, you must use the scope parameter.
    *        you can get the scope via hooks `useScopeContext()`
    */
   getActions(scope?: ScopeContext): Actions;
+  /** Retrieve computed outside React components,
+   *
+   *  note: By default, the return value will be the global module state.
+   *        If you want to get "scope-inner" computed, you must use the scope parameter.
+   *        you can get the scope via hooks `useScopeContext()`
+   */
+  getComputed(scope?: ScopeContext): Computed;
 };
 
 /* Auto setState, copied from solid-js/store/types */

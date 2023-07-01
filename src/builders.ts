@@ -26,14 +26,14 @@ export function extendComputed(computed: ComputedRecord, rawModule: RawModule): 
 }
 
 // Support two ways of methods definition: this type & function type
-export function extendMethods<State extends StateRecord, Actions extends ActionsRecord<State>>(
-  builder: MethodBuilderFn<State, Actions> | MethodBuilder,
+export function extendMethods<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord>(
+  builder: MethodBuilderFn<State, Actions, Computed> | MethodBuilder,
   rawModule: RawModule
 ): RawModule {
   const builderFn =
     typeof builder === 'function'
       ? builder
-      : (perform: Perform<State, Actions>) =>
+      : (perform: Perform<State, Actions, Computed>) =>
           Object.keys(builder).reduce((acc, cur) => {
             acc[cur] = builder[cur].bind(perform);
             return acc;
@@ -72,12 +72,17 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
       const stateCreator: StateCreator<any, any, any> = redux(scopeReducer, mergedState);
       const middlewares = middleware ? [middleware] : rawModule.middlewares;
 
-      const computed: ComputedRecord = {};
+      // the hooks map has getter functions, which use the getter function as selector to the store
+      const computedHooksMap: ComputedRecord = {};
+      // The raw map is only a getter function, without subscription to the zustand store
+      const computedRawMap: ComputedRecord = {};
+
       const cachedActionsMap = new WeakMap<ScopeContext, ActionsRecord<State>>();
 
       const self: Scope<State, Actions> = {
         store: create(middlewares.reduce((acc, middleware) => middleware(acc), stateCreator)),
-        getComputed: () => computed,
+        getComputed: () => computedRawMap,
+        getComputedHooks: () => computedHooksMap,
         getActions: (context: ScopeContext) => {
           const cachedAction = cachedActionsMap.get(context);
           if (cachedAction) return cachedAction as Actions & ActionsRecord<State>;
@@ -115,17 +120,18 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
           Object.keys(rawModule.reducers).forEach((key: any) => {
             (actions as Record<string, (...args: any) => unknown>)[key] = (...args: any) => dispatch({ type: key, payload: args });
           });
-          const getScope = (module?: HooksModule<any, any>): Scope<any, any> => {
+          const getScope = (module?: HooksModule<any, any, any>): Scope<any, any, any> => {
             if (!module) return self;
             return getScopeOrBuild(context, module);
           };
           let isBuildingMethods = false;
-          const perform: Perform<State, Actions & ActionsRecord<State>> = {
+          const perform: Perform<State, Actions & ActionsRecord<State>, ComputedRecord> = {
             getState: (module?: HooksModule) => getScope(module).getState(),
             getActions: (module?: HooksModule) => {
               if (isBuildingMethods) throw new Error('should not call getActions in the method builder, call it inside a method.');
               return getScope(module).getActions(context);
             },
+            getComputed: (module?: HooksModule) => getScope(module).getComputed(),
           };
           isBuildingMethods = true;
           rawModule.methodsBuilders.forEach((builder) => {
@@ -141,8 +147,11 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
       // bind Computed
       Object.keys(rawModule.computed).forEach((key) => {
         rawModule.computed[key] = simpleMemoizedFn(rawModule.computed[key]);
-        Object.defineProperty(computed, key, {
+        Object.defineProperty(computedHooksMap, key, {
           get: () => self.store(rawModule.computed[key]),
+        });
+        Object.defineProperty(computedRawMap, key, {
+          get: () => rawModule.computed[key](self.getState()),
         });
       });
 
@@ -164,11 +173,12 @@ export function buildModule<State extends StateRecord, Actions extends ActionsRe
       use: (selector: (state: State) => unknown, equalFn: EqualityChecker<unknown>) => [module.useState(selector, equalFn), module.useActions(), module.useComputed()],
       useState: (selector: (state: State) => unknown, equalFn: EqualityChecker<unknown>) => useScope().store(selector, equalFn),
       useActions: () => useScope().getActions(useScopeContext()),
-      useComputed: () => useScope().getComputed(),
+      useComputed: () => useScope().getComputedHooks(),
       useStore: () => useScope().store,
       getStore: (context = globalContext) => getScopeOrBuild(context, module).store,
       getState: (context = globalContext) => getScopeOrBuild(context, module).getState(),
       getActions: (context = globalContext) => getScopeOrBuild(context, module).getActions(context),
+      getComputed: (context = globalContext) => getScopeOrBuild(context, module).getComputed(),
       [__buildScopeSymbol]: buildScope,
     } as HooksModule<State, Actions>;
 
