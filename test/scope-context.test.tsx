@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { act } from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { act, cleanup, render, fireEvent, renderHook } from '@testing-library/react';
+import { cleanup, render, fireEvent, renderHook } from '@testing-library/react';
 import { defineModule, defineProvider, useScopeContext } from '../src';
 import { useCallback } from 'react';
 
@@ -64,7 +64,7 @@ describe('test scope context', () => {
         <Provider>
           <Counter testId={'inner'} />
         </Provider>
-      </div>
+      </div>,
     );
 
     const outer = container.getByTestId('outer');
@@ -89,7 +89,7 @@ describe('test scope context', () => {
     render(
       <Provider>
         <Component />
-      </Provider>
+      </Provider>,
     );
     expect(originalMiddleware).not.toBeCalled();
     expect(handledMiddleware).toBeCalled();
@@ -108,7 +108,7 @@ describe('test scope context', () => {
         <LogProvider>
           <Counter testId={'inner'} />
         </LogProvider>
-      </div>
+      </div>,
     );
     const outer = container.getByTestId('outer');
     const inner = container.getByTestId('inner');
@@ -184,7 +184,7 @@ describe('test scope context', () => {
         <Provider>
           <Counter testId={'inner'} />
         </Provider>
-      </div>
+      </div>,
     );
 
     const outer = container.getByTestId('outer');

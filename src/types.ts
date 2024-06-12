@@ -25,7 +25,7 @@ export type Perform<State extends StateRecord, Actions extends ActionsRecord<Sta
 export type ActionBuilder<State extends StateRecord> = Record<string, (draft: Draft<State>, ...args: any) => void>;
 export type ComputedBuilder<State extends StateRecord> = Record<string, (state: State) => any>;
 export type MethodBuilderFn<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord> = (
-  perform: Perform<State, Actions, Computed>
+  perform: Perform<State, Actions, Computed>,
 ) => Record<any, (...args: any) => any>;
 export type MethodBuilder = Record<any, (...args: any) => any>;
 export type MiddlewareBuilder<State extends StateRecord> = (creator: StateCreator<State, any, any, any>) => StateCreator<State, any, any, any>;
@@ -54,7 +54,7 @@ export type ModuleFactory<
   State extends StateRecord = {},
   Actions extends ActionsRecord<State> = ActionsRecord<State>,
   Computed extends ComputedRecord = {},
-  Excluded extends string = never
+  Excluded extends string = never,
 > = {
   actions<A extends ActionBuilder<State>>(actions: A): Omit<ModuleFactory<State, GenAction<A> & Actions, Computed, Excluded | 'actions'>, Excluded | 'actions'>;
   computed<C extends ComputedBuilder<State>>(computed: C): Omit<ModuleFactory<State, Actions, GenComputed<C>, Excluded | 'computed'>, Excluded | 'computed'>;

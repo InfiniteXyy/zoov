@@ -28,7 +28,7 @@ function defineModule<State extends StateRecord>(defaultState: State): ModuleFac
 function useModule<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord, StateResult = State>(
   module: HooksModule<State, Actions, Computed>,
   selector?: (state: State) => StateResult,
-  equalityFn?: EqualityChecker<StateResult>
+  equalityFn?: EqualityChecker<StateResult>,
 ): [StateResult, Actions, Computed] {
   return module.use(selector, equalityFn);
 }

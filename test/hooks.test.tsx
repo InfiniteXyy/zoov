@@ -1,8 +1,9 @@
-import { act, renderHook, cleanup } from '@testing-library/react';
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { cleanup, renderHook } from '@testing-library/react';
+import { act } from 'react';
+import { map, throttleTime } from 'rxjs/operators';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineModule, defineProvider, useModule, useModuleActions, useModuleComputed } from '../src';
 import { effect } from '../src/effect';
-import { map, throttleTime } from 'rxjs/operators';
 import { MiddlewareBuilder } from '../src/types';
 
 type State = { count: number; input: string };
@@ -197,8 +198,8 @@ describe('test hooks', function () {
             effectMultBy: effect<number>((payload$) =>
               payload$.pipe(
                 throttleTime(30),
-                map((times) => getActions().multBy(times))
-              )
+                map((times) => getActions().multBy(times)),
+              ),
             ),
           }))
           .build(),
@@ -227,7 +228,7 @@ describe('test hooks', function () {
             effectMultBy: effect(function (payload$) {
               return payload$.pipe(
                 throttleTime(30),
-                map((times) => getActions().multBy(times))
+                map((times) => getActions().multBy(times)),
               );
             }),
           }))
@@ -352,7 +353,7 @@ it('should $reset action works in provider', () => {
       const state = module.useState();
       return { $setState, $reset, state };
     },
-    { wrapper: Provider }
+    { wrapper: Provider },
   );
 
   act(() => void result.current.$setState('checked', true));

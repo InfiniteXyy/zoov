@@ -1,5 +1,5 @@
+import { act } from 'react';
 import { renderHook } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { defineModule } from '../src';
 import { useTrackedModule } from '../src/tracked';

@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { create } from 'zustand';
+import { createWithEqualityFn as create } from 'zustand/traditional';
 import { redux } from 'zustand/middleware';
 import { globalContext, useScopeContext } from './context';
 import { MethodBuilderFn, __buildScopeSymbol } from './types';
@@ -11,13 +11,16 @@ import type { Perform, ScopeBuildOption, MethodBuilder, MiddlewareBuilder, Actio
 
 export function extendActions<State extends StateRecord, Actions extends ActionsRecord<State>>(
   rawActions: Actions & Record<string, Action>,
-  rawModule: RawModule<State, Actions>
+  rawModule: RawModule<State, Actions>,
 ): RawModule<State, Actions> {
   const reducerKeys: string[] = Object.keys(rawActions);
-  const reducers = reducerKeys.reduce((acc, key) => {
-    acc[key] = (...args: unknown[]) => produce((draft) => void rawActions[key](draft, ...args));
-    return acc;
-  }, {} as Record<string, Reducer<State>>);
+  const reducers = reducerKeys.reduce(
+    (acc, key) => {
+      acc[key] = (...args: unknown[]) => produce((draft) => void rawActions[key](draft, ...args));
+      return acc;
+    },
+    {} as Record<string, Reducer<State>>,
+  );
   return { ...rawModule, reducers };
 }
 
@@ -28,16 +31,19 @@ export function extendComputed(computed: ComputedRecord, rawModule: RawModule): 
 // Support two ways of methods definition: this type & function type
 export function extendMethods<State extends StateRecord, Actions extends ActionsRecord<State>, Computed extends ComputedRecord>(
   builder: MethodBuilderFn<State, Actions, Computed> | MethodBuilder,
-  rawModule: RawModule
+  rawModule: RawModule,
 ): RawModule {
   const builderFn =
     typeof builder === 'function'
       ? builder
       : (perform: Perform<State, Actions, Computed>) =>
-          Object.keys(builder).reduce((acc, cur) => {
-            acc[cur] = builder[cur].bind(perform);
-            return acc;
-          }, {} as Record<string, (...args: any) => any>);
+          Object.keys(builder).reduce(
+            (acc, cur) => {
+              acc[cur] = builder[cur].bind(perform);
+              return acc;
+            },
+            {} as Record<string, (...args: any) => any>,
+          );
   return {
     ...rawModule,
     methodsBuilders: [...rawModule.methodsBuilders, builderFn],

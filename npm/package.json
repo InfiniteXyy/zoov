@@ -64,14 +64,14 @@
     "**"
   ],
   "dependencies": {
-    "proxy-compare": "^2.4.0"
+    "proxy-compare": "^3.0.0"
   },
   "peerDependencies": {
     "immer": ">=9.0.0",
     "react": ">=16.8.0",
     "react-tracked": ">=1.0.0",
     "rxjs": ">=7.0.0",
-    "zustand": ">= 4.3"
+    "zustand": ">= 4.5"
   },
   "peerDependenciesMeta": {
     "rxjs": {
