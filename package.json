@@ -17,6 +17,7 @@
   "devDependencies": {
     "@redux-devtools/extension": "^3.3.0",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@testing-library/dom": "^10.1.0",
     "@testing-library/react": "^16.0.0",
     "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",
@@ -35,6 +36,7 @@
     "rimraf": "^5.0.7",
     "rollup": "^4.18.0",
     "rxjs": "^7.8.1",
+    "scheduler": "^0.23.2",
     "taze": "^0.13.8",
     "tslib": "^2.6.3",
     "typescript": "^5.4.5",

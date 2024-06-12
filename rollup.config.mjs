@@ -1,7 +1,7 @@
 import { defineConfig } from 'rollup';
 import typescript from '@rollup/plugin-typescript';
 
-const external = ['zustand', 'zustand/middleware', 'rxjs', 'immer', 'react', 'react-tracked', 'proxy-compare'];
+const external = ['zustand', 'zustand/middleware', 'zustand/traditional', 'rxjs', 'immer', 'react', 'react-tracked', 'proxy-compare'];
 
 const createTypesConfig = (input) => {
   return defineConfig({
