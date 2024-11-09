@@ -1,4 +1,5 @@
-import type { StateCreator, StoreApi, UseBoundStore } from 'zustand';
+import type { StateCreator, StoreApi } from 'zustand';
+import type { UseBoundStoreWithEqualityFn as UseBoundStore } from 'zustand/traditional';
 import type { Draft } from 'immer';
 
 /* Utility Types */
@@ -125,12 +126,12 @@ export type StoreSetter<T> = T | ((prevState: T) => T);
 
 /* prettier-ignore */
 export interface SetState<T> {
-  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, K6 extends Part<T5>, K7 extends Part<T6>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4>, T5 extends WrappableNext<T4, K5>, T6 extends WrappableNext<T5, K6> >( k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, k6: K6, k7: K7, setter: StoreSetter<Next<T6, K7>>): void;
-  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, K6 extends Part<T5>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4>, T5 extends WrappableNext<T4, K5> >( k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, k6: K6, setter: StoreSetter<Next<T5, K6>> ): void;
-  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4> >( k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, setter: StoreSetter<Next<T4, K5>> ): void;
-  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3> >( k1: K1, k2: K2, k3: K3, k4: K4, setter: StoreSetter<Next<T3, K4>> ): void;
-  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2> >( k1: K1, k2: K2, k3: K3, setter: StoreSetter<Next<T2, K3>> ): void;
-  <K1 extends Part<T>, K2 extends Part<T1>, T1 extends WrappableNext<T, K1>>( k1: K1, k2: K2, setter: StoreSetter<Next<T1, K2>> ): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, K6 extends Part<T5>, K7 extends Part<T6>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4>, T5 extends WrappableNext<T4, K5>, T6 extends WrappableNext<T5, K6>>(k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, k6: K6, k7: K7, setter: StoreSetter<Next<T6, K7>>): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, K6 extends Part<T5>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4>, T5 extends WrappableNext<T4, K5>>(k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, k6: K6, setter: StoreSetter<Next<T5, K6>>): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, K5 extends Part<T4>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>, T4 extends WrappableNext<T3, K4>>(k1: K1, k2: K2, k3: K3, k4: K4, k5: K5, setter: StoreSetter<Next<T4, K5>>): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, K4 extends Part<T3>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>, T3 extends WrappableNext<T2, K3>>(k1: K1, k2: K2, k3: K3, k4: K4, setter: StoreSetter<Next<T3, K4>>): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, K3 extends Part<T2>, T1 extends WrappableNext<T, K1>, T2 extends WrappableNext<T1, K2>>(k1: K1, k2: K2, k3: K3, setter: StoreSetter<Next<T2, K3>>): void;
+  <K1 extends Part<T>, K2 extends Part<T1>, T1 extends WrappableNext<T, K1>>(k1: K1, k2: K2, setter: StoreSetter<Next<T1, K2>>): void;
   <K extends Part<T>>(k: K, setter: StoreSetter<Next<T, K>>): void;
   (setter: StoreSetter<T>): void;
 }

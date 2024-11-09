@@ -1,3 +1,7 @@
+## 0.5.7
+
+- chore: upgrade dependencies
+
 ## 0.5.6
 
 - feat: Add `getComputed` to module, support call `getComputed` in a method builder
