@@ -2,7 +2,6 @@
 <p align="center">✨ ZOOV = Zustand + module</p>
 <p align="center">
 <a href="https://github.com/infinitexyy/zoov/actions"><img src="https://img.shields.io/github/actions/workflow/status/infinitexyy/zoov/main.yml?branch=main" alt="Build Status"></a>
-<a href="https://codecov.io/gh/infinitexyy/zoov"><img src="https://img.shields.io/codecov/c/github/infinitexyy/zoov.svg" alt="Code Coverage"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=zoov"><img src="https://img.shields.io/bundlephobia/minzip/zoov" alt="minzip"></a>
@@ -85,8 +84,8 @@ const counterModule = defineModule({ count: 0 })
         payload$.pipe(
           exhaustMap((timeout) => {
             return timer(timeout).pipe(tap(() => getActions().add()));
-          })
-        )
+          }),
+        ),
       ),
     };
   })
