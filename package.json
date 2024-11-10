@@ -41,6 +41,7 @@
     "taze": "^0.18.0",
     "tslib": "^2.8.1",
     "typescript": "^5.6.3",
+    "use-sync-external-store": "^1.2.2",
     "vite": "^5.4.10",
     "vitest": "^2.1.4",
     "zustand": "^5.0.1"
