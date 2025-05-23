@@ -1,3 +1,7 @@
+## 0.5.9
+
+- Update deps & update readme
+
 ## 0.5.8
 
 - add `use-sync-external-store` as dev dependency as it's required in `zustand/traditional` in v5

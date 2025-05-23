@@ -4,10 +4,12 @@
 <a href="https://github.com/infinitexyy/zoov/actions"><img src="https://img.shields.io/github/actions/workflow/status/infinitexyy/zoov/main.yml?branch=main" alt="Build Status"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/v/zoov.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/zoov"><img src="https://img.shields.io/npm/dt/zoov.svg" alt="npm-d"></a>
+<a href="https://github.com/InfiniteXyy/zoov"><img alt="GitHub License" src="https://img.shields.io/github/license/InfiniteXyy/zoov"></a>
 <a href="https://bundlephobia.com/result?p=zoov"><img src="https://img.shields.io/bundlephobia/minzip/zoov" alt="minzip"></a>
+
 </p>
 <p align="center">
-<a href="https://zoov.xyynext.com">Read the docs</a>
+<a href="https://infinitexyy.gitbook.io/zoov">Read the docs</a>
 </p>
 
 ## Features
