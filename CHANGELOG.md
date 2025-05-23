@@ -1,6 +1,6 @@
 ## 0.5.9
 
-- Update deps & update readme
+- chore: update deps & update readme
 
 ## 0.5.8
 
